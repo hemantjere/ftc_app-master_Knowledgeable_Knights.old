@@ -35,7 +35,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -58,13 +57,13 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-     DcMotor leftMotor = null;
-     DcMotor rightMotor = null;
-     DcMotor conveyorMotor = null;
+     DcMotor leftDrive = null;
+     DcMotor rightDrive = null;
+     DcMotor spinArm = null;
      Servo leftArm = null;
      Servo rightArm = null;
-     Servo leftLift = null;
-     Servo rightLift = null;
+     Servo leftHand = null;
+     Servo rightHand = null;
 
     @Override
 
@@ -76,25 +75,25 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
          * to 'get' must correspond to the names assigned during the robot configuration
          * step (using the FTC Robot Controller app on the phone).
          */
-        leftMotor  = hardwareMap.dcMotor.get("left motor");
-        rightMotor = hardwareMap.dcMotor.get("right motor");
-        conveyorMotor = hardwareMap.dcMotor.get("conveyor belt");
-        leftArm = hardwareMap.servo.get("left arm servo");
-        rightArm = hardwareMap.servo.get("right arm servo");
-        leftLift = hardwareMap.servo.get("left lift servo");
-        rightLift = hardwareMap.servo.get("right lift servo");
+        leftDrive = hardwareMap.dcMotor.get("left drive wheel");
+        rightDrive = hardwareMap.dcMotor.get("right drive wheel");
+        spinArm = hardwareMap.dcMotor.get("spin arm");
+        leftArm = hardwareMap.servo.get("left arm");
+        rightArm = hardwareMap.servo.get("right arm");
+        leftHand = hardwareMap.servo.get("left hand");
+        rightHand = hardwareMap.servo.get("right hand");
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
-        leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        conveyorMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        spinArm.setDirection(DcMotor.Direction.FORWARD);
 
         // servo stuff
         //leftArm.scaleRange(0.2, 1.0);
         //rightArm.scaleRange(0.05, 0.8);
 
-        //leftLift.scaleRange(0.0, 0.6);
-        //rightLift.scaleRange(0.3, 1.0);
+        //leftHand.scaleRange(0.0, 0.6);
+        //rightHand.scaleRange(0.3, 1.0);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -103,8 +102,8 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         leftArm.setPosition(0.35);
         rightArm.setPosition(0.65);
 
-        leftLift.setPosition(1.0);
-        rightLift.setPosition(0.0);
+        leftHand.setPosition(1.0);
+        rightHand.setPosition(0.0);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -122,20 +121,20 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
             telemetry.update();
 
             // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
-             leftMotor.setPower(gamepad1.left_stick_y*0.2);
-             rightMotor.setPower(gamepad1.right_stick_y*0.2);
+             leftDrive.setPower(gamepad1.left_stick_y*0.2);
+             rightDrive.setPower(gamepad1.right_stick_y*0.2);
 
             // MIDDLE MOTOR FOR LANUCHING DA BALZ
             if(gamepad2.right_trigger>0.25){
-                 conveyorMotor.setDirection(DcMotor.Direction.FORWARD);
-                 conveyorMotor.setPower(gamepad2.right_trigger*1.0);
+                 spinArm.setDirection(DcMotor.Direction.FORWARD);
+                 spinArm.setPower(gamepad2.right_trigger*1.0);
             }
             else if(gamepad2.left_trigger>0.25){
-                conveyorMotor.setDirection(DcMotor.Direction.REVERSE);
-                conveyorMotor.setPower(gamepad2.left_trigger*1.0);
+                spinArm.setDirection(DcMotor.Direction.REVERSE);
+                spinArm.setPower(gamepad2.left_trigger*1.0);
             }
             else {
-                conveyorMotor.setPower(0);
+                spinArm.setPower(0);
             }
 
             // Big bALLZ POOPER SCOOPER main arm

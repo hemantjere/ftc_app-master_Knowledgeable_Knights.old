@@ -55,6 +55,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_OpMode_Control extends LinearOpMode {
 
+    private double SPIN_ARM_MAXSPEED = 1d;
+    private double SPIN_ARM_MINSPEED = .2d;
+    private double SPIN_ARM_STOP = 0d;
+    private double DEADZONE = .1d;
+    private long SPIN_ARM_ROTATE_TIME = 400;
+
+    private double DRIVE_MULTIPLE = .2d;
+
+    private double HAND_SPEED = .05d;
+
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
      DcMotor leftDrive = null;
@@ -99,11 +109,14 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        leftArm.setPosition(0.35);
-        rightArm.setPosition(0.65);
-
+//        leftArm.setPosition(0.35);
+//        rightArm.setPosition(0.65);
+//
         leftHand.setPosition(1.0);
         rightHand.setPosition(0.0);
+
+        int leftHandDirection = -1;
+        int rightHandDirection = 1;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -121,39 +134,80 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
             telemetry.update();
 
             // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
-             leftDrive.setPower(gamepad1.left_stick_y*0.2);
-             rightDrive.setPower(gamepad1.right_stick_y*0.2);
+             leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
+             rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
 
-            // MIDDLE MOTOR FOR LANUCHING DA BALZ
-            if(gamepad2.right_trigger>0.25){
+            // Spin Arm setup
+            if(gamepad2.right_trigger> DEADZONE){
                  spinArm.setDirection(DcMotor.Direction.FORWARD);
-                 spinArm.setPower(gamepad2.right_trigger*1.0);
+                 if(gamepad2.right_bumper==true){
+                     spinArm.setPower(gamepad2.right_trigger*SPIN_ARM_MINSPEED);
+                 }
+                 else {
+                     spinArm.setPower(SPIN_ARM_MAXSPEED);
+                     Thread.sleep(SPIN_ARM_ROTATE_TIME);
+                     spinArm.setPower(SPIN_ARM_STOP);
+                 }
             }
-            else if(gamepad2.left_trigger>0.25){
+            else if(gamepad2.left_trigger> DEADZONE){
                 spinArm.setDirection(DcMotor.Direction.REVERSE);
-                spinArm.setPower(gamepad2.left_trigger*1.0);
+                if(gamepad2.left_bumper==true){
+                    spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
+                }
+                else {
+                    spinArm.setPower(SPIN_ARM_MAXSPEED);
+                    Thread.sleep(SPIN_ARM_ROTATE_TIME);
+                    spinArm.setPower(SPIN_ARM_STOP);
+                }
             }
             else {
-                spinArm.setPower(0);
+                spinArm.setPower(SPIN_ARM_STOP);
             }
 
-            // Big bALLZ POOPER SCOOPER main arm
-            if(gamepad1.right_trigger>0.25){
-                //leftArm.setDirection(Servo.Direction.FORWARD);
-                leftArm.setPosition(leftArm.getPosition() - .1d);
-                //rightArm.setDirection(Servo.Direction.REVERSE);
-                rightArm.setPosition(rightArm.getPosition() + .1d);
+            // Hand code right and left gamepad 1 triggers
+            if(gamepad1.right_trigger > DEADZONE){
+                rightHand.setPosition(rightHand.getPosition() - HAND_SPEED);
             }
-            else if(gamepad1.left_trigger>0.25){
-                //leftArm.setDirection(Servo.Direction.REVERSE);
-                leftArm.setPosition(leftArm.getPosition() + .1d);
-                //rightArm.setDirection(Servo.Direction.FORWARD);
-                rightArm.setPosition(rightArm.getPosition() - .1d);
+            else if(gamepad1.right_bumper == true){
+                rightHand.setPosition(rightHand.getPosition() + HAND_SPEED);
             }
+
+            if(gamepad1.left_trigger > DEADZONE){
+                leftHand.setPosition(leftHand.getPosition() + HAND_SPEED);
+            }
+            else if(gamepad1.left_bumper == true){
+                leftHand.setPosition(leftHand.getPosition() - HAND_SPEED);
+            }
+
+
+//            if(gamepad1.right_trigger > DEADZONE){
+//                rightHand.setPosition(rightHand.getPosition() + (HAND_SPEED * rightHandDirection));
+//            }
+//            else if ((gamepad1.right_trigger != 0) && (gamepad1.right_trigger < DEADZONE)) {
+//                rightHandDirection *= -1;
+//            }
+//            else if(gamepad1.left_trigger > DEADZONE){
+//                leftHand.setPosition((leftHand.getPosition() + HAND_SPEED) * leftHandDirection);
+//            }
+//            else if ((gamepad1.left_trigger != 0) && (gamepad1.left_trigger < DEADZONE)) {
+//                leftHandDirection *= -1;
+//            }
+
+//            // Left/Right arm for cap ball lift
+//            if(gamepad1.right_trigger>0.25){
+//                //leftArm.setDirection(Servo.Direction.FORWARD);
+//                leftArm.setPosition(leftArm.getPosition() - .1d);
+//                //rightArm.setDirection(Servo.Direction.REVERSE);
+//                rightArm.setPosition(rightArm.getPosition() + .1d);
+//            }
+//            else if(gamepad1.left_trigger>0.25){
+//                //leftArm.setDirection(Servo.Direction.REVERSE);
+//                leftArm.setPosition(leftArm.getPosition() + .1d);
+//                //rightArm.setDirection(Servo.Direction.FORWARD);
+//                rightArm.setPosition(rightArm.getPosition() - .1d);
+//            }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
-
-
         }
     }
 }

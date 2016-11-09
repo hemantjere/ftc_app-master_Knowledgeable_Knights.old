@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -56,10 +57,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BBOTZ_OpMode_Control extends LinearOpMode {
 
     private double SPIN_ARM_MAXSPEED = 1d;
-    private double SPIN_ARM_MINSPEED = .2d;
+    private double SPIN_ARM_MINSPEED = .15d;
     private double SPIN_ARM_STOP = 0d;
     private double DEADZONE = .1d;
-    private long SPIN_ARM_ROTATE_TIME = 400;
+    private long SPIN_ARM_ROTATE_TIME = 100;
 
     private double DRIVE_MULTIPLE = .2d;
 
@@ -88,8 +89,8 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         leftDrive = hardwareMap.dcMotor.get("left drive wheel");
         rightDrive = hardwareMap.dcMotor.get("right drive wheel");
         spinArm = hardwareMap.dcMotor.get("spin arm");
-        leftArm = hardwareMap.servo.get("left arm");
-        rightArm = hardwareMap.servo.get("right arm");
+//        leftArm = hardwareMap.servo.get("left arm");
+//        rightArm = hardwareMap.servo.get("right arm");
         leftHand = hardwareMap.servo.get("left hand");
         rightHand = hardwareMap.servo.get("right hand");
         // eg: Set the drive motor directions:
@@ -120,16 +121,18 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double leftArmPos = leftArm.getPosition();
-            double rightArmPos = rightArm.getPosition();
+//            double leftArmPos = leftArm.getPosition();
+//            double rightArmPos = rightArm.getPosition();
+            double leftHandPos = leftHand.getPosition();
+            double rightHandPos = rightHand.getPosition();
 
             // getdirection does not display unless you set the direction
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            if (leftArmPos != Double.NaN) {
-                telemetry.addData("Status", "Left Arm: " + leftArmPos);
+            if (leftHandPos != Double.NaN) {
+                telemetry.addData("Status", "Left Hand: " + leftHandPos);
             }
-            if (rightArmPos != Double.NaN) {
-                telemetry.addData("Status", "Right Arm: " + rightArmPos);
+            if (rightHandPos != Double.NaN) {
+                telemetry.addData("Status", "Right Hand: " + rightHandPos);
             }
             telemetry.update();
 
@@ -139,6 +142,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 
             // Spin Arm setup
             if(gamepad2.right_trigger> DEADZONE){
+                 //forward direction, launch mode
                  spinArm.setDirection(DcMotor.Direction.FORWARD);
                  if(gamepad2.right_bumper==true){
                      spinArm.setPower(gamepad2.right_trigger*SPIN_ARM_MINSPEED);
@@ -150,6 +154,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                  }
             }
             else if(gamepad2.left_trigger> DEADZONE){
+                //reverse direction, launch mode
                 spinArm.setDirection(DcMotor.Direction.REVERSE);
                 if(gamepad2.left_bumper==true){
                     spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
@@ -164,18 +169,22 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                 spinArm.setPower(SPIN_ARM_STOP);
             }
 
-            // Hand code right and left gamepad 1 triggers
-            if(gamepad1.right_trigger > DEADZONE){
+            // Hand control code
+            if(gamepad2.right_stick_y > DEADZONE){
+                //gamepad 2 right joystick forward
                 rightHand.setPosition(rightHand.getPosition() - HAND_SPEED);
             }
-            else if(gamepad1.right_bumper == true){
+            else if(gamepad2.right_stick_y < (-1 * DEADZONE)){
+                //gamepad 2 right joystick reverse
                 rightHand.setPosition(rightHand.getPosition() + HAND_SPEED);
             }
 
-            if(gamepad1.left_trigger > DEADZONE){
+            if(gamepad2.left_stick_y > DEADZONE){
+                //gamepad 2 left joystick forward
                 leftHand.setPosition(leftHand.getPosition() + HAND_SPEED);
             }
-            else if(gamepad1.left_bumper == true){
+            else if(gamepad2.left_stick_y < (-1 * DEADZONE)){
+                //gamepad 2 left joystick reverse
                 leftHand.setPosition(leftHand.getPosition() - HAND_SPEED);
             }
 

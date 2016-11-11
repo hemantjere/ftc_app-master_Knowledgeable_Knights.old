@@ -54,11 +54,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
 
-    private double MAX_DRIVE_SPEED = .5d;
+    private double MAX_DRIVE_SPEED = .2d;
     private double STOP_DRIVE = 0d;
     private double SPIN_ARM_FORWARD_MAXSPEED = 1d;
     private double SPIN_ARM_STOP = 0d;
-    private long SPIN_ARM_ROTATE_TIME = 200;
+    private long SPIN_ARM_ROTATE_TIME = 400;
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -81,9 +81,9 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
 
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        spinArm.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
+        spinArm.setDirection(DcMotor.Direction.REVERSE);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -93,14 +93,16 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         // Advance 36", then stop
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(2000);
+        Thread.sleep(1900);
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(1000);
 
         // Launch ball
         spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
         Thread.sleep(SPIN_ARM_ROTATE_TIME);
         spinArm.setPower(SPIN_ARM_STOP);
+        Thread.sleep(1000);
 
         // Advance 30" to knock off big ball, then stop
         leftDrive.setPower(MAX_DRIVE_SPEED);
@@ -108,15 +110,17 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         Thread.sleep(1400);
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(1000);
 
         // Rotate left ~40 degrees
-        leftDrive.setPower(MAX_DRIVE_SPEED);
+        rightDrive.setPower(MAX_DRIVE_SPEED);
         Thread.sleep(600);
-        leftDrive.setPower(STOP_DRIVE);
+        rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(1000);
 
         // Backup up ramp ~70"
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
         Thread.sleep(4000);

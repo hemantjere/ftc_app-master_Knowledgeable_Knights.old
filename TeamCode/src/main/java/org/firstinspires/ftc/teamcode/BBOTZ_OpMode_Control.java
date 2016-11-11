@@ -89,10 +89,11 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         leftDrive = hardwareMap.dcMotor.get("left drive wheel");
         rightDrive = hardwareMap.dcMotor.get("right drive wheel");
         spinArm = hardwareMap.dcMotor.get("spin arm");
-//        leftArm = hardwareMap.servo.get("left arm");
-//        rightArm = hardwareMap.servo.get("right arm");
+        // leftArm = hardwareMap.servo.get("left arm");
+        // rightArm = hardwareMap.servo.get("right arm");
         leftHand = hardwareMap.servo.get("left hand");
         rightHand = hardwareMap.servo.get("right hand");
+
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
@@ -100,45 +101,48 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         spinArm.setDirection(DcMotor.Direction.FORWARD);
 
         // servo stuff
-        //leftArm.scaleRange(0.2, 1.0);
-        //rightArm.scaleRange(0.05, 0.8);
+        // leftArm.scaleRange(0.2, 1.0);
+        // rightArm.scaleRange(0.05, 0.8);
 
-        //leftHand.scaleRange(0.0, 0.6);
-        //rightHand.scaleRange(0.3, 1.0);
+        // leftHand.scaleRange(0.0, 0.6);
+        // rightHand.scaleRange(0.3, 1.0);
+
+        // leftHand.setPosition(1.0);
+        // rightHand.setPosition(0.0);
+
+        // int leftHandDirection = -1;
+        // int rightHandDirection = 1;
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-//        leftArm.setPosition(0.35);
-//        rightArm.setPosition(0.65);
-//
-        leftHand.setPosition(1.0);
-        rightHand.setPosition(0.0);
-
-        int leftHandDirection = -1;
-        int rightHandDirection = 1;
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-//            double leftArmPos = leftArm.getPosition();
-//            double rightArmPos = rightArm.getPosition();
-            double leftHandPos = leftHand.getPosition();
-            double rightHandPos = rightHand.getPosition();
+            // double leftHandPos = leftHand.getPosition();
+            // double rightHandPos = rightHand.getPosition();
 
-            // getdirection does not display unless you set the direction
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            if (leftHandPos != Double.NaN) {
-                telemetry.addData("Status", "Left Hand: " + leftHandPos);
-            }
-            if (rightHandPos != Double.NaN) {
-                telemetry.addData("Status", "Right Hand: " + rightHandPos);
-            }
-            telemetry.update();
+//            // get direction does not display unless you set the direction
+//            telemetry.addData("Status", "Run Time: " + runtime.toString());
+//            if (leftHandPos != Double.NaN) {
+//                telemetry.addData("Status", "Left Hand: " + leftHandPos);
+//            }
+//            if (rightHandPos != Double.NaN) {
+//                telemetry.addData("Status", "Right Hand: " + rightHandPos);
+//            }
+//            telemetry.update();
 
             // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
-             leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
-             rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
+            if (gamepad1.left_bumper == true) {
+                // slow down robot
+                leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
+                rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
+            }
+            else {
+                // speed up robot
+                leftDrive.setPower(gamepad1.left_stick_y);
+                rightDrive.setPower(gamepad1.right_stick_y);
+            }
 
             // Spin Arm setup
             if(gamepad2.right_trigger> DEADZONE){
@@ -169,24 +173,24 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                 spinArm.setPower(SPIN_ARM_STOP);
             }
 
-            // Hand control code
-            if(gamepad2.right_stick_y > DEADZONE){
-                //gamepad 2 right joystick forward
-                rightHand.setPosition(rightHand.getPosition() - HAND_SPEED);
-            }
-            else if(gamepad2.right_stick_y < (-1 * DEADZONE)){
-                //gamepad 2 right joystick reverse
-                rightHand.setPosition(rightHand.getPosition() + HAND_SPEED);
-            }
-
-            if(gamepad2.left_stick_y > DEADZONE){
-                //gamepad 2 left joystick forward
-                leftHand.setPosition(leftHand.getPosition() + HAND_SPEED);
-            }
-            else if(gamepad2.left_stick_y < (-1 * DEADZONE)){
-                //gamepad 2 left joystick reverse
-                leftHand.setPosition(leftHand.getPosition() - HAND_SPEED);
-            }
+//            // Hand control code
+//            if(gamepad2.right_stick_y > DEADZONE){
+//                //gamepad 2 right joystick forward
+//                rightHand.setPosition(rightHand.getPosition() - HAND_SPEED);
+//            }
+//            else if(gamepad2.right_stick_y < (-1 * DEADZONE)){
+//                //gamepad 2 right joystick reverse
+//                rightHand.setPosition(rightHand.getPosition() + HAND_SPEED);
+//            }
+//
+//            if(gamepad2.left_stick_y > DEADZONE){
+//                //gamepad 2 left joystick forward
+//                leftHand.setPosition(leftHand.getPosition() + HAND_SPEED);
+//            }
+//            else if(gamepad2.left_stick_y < (-1 * DEADZONE)){
+//                //gamepad 2 left joystick reverse
+//                leftHand.setPosition(leftHand.getPosition() - HAND_SPEED);
+//            }
 
 
 //            if(gamepad1.right_trigger > DEADZONE){

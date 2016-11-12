@@ -146,26 +146,26 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 
             // Spin Arm setup
             if(gamepad2.right_trigger> DEADZONE){
-                // slow push mode
-                spinArm.setDirection(DcMotor.Direction.FORWARD);
+                // slow throw mode
+                spinArm.setDirection(DcMotor.Direction.REVERSE);
                 spinArm.setPower(gamepad2.right_trigger*SPIN_ARM_MINSPEED);
             }
             else if(gamepad2.right_bumper==true){
-                // fast push mode
-                spinArm.setDirection(DcMotor.Direction.FORWARD);
-                spinArm.setPower(SPIN_ARM_REVERSE_MAXSPEED);
+                // fast throw mode
+                spinArm.setDirection(DcMotor.Direction.REVERSE);
+                spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
                 Thread.sleep(SPIN_ARM_ROTATE_TIME);
                 spinArm.setPower(SPIN_ARM_STOP);
             }
             else if(gamepad2.left_trigger> DEADZONE){
-                // slow throw mode
-                spinArm.setDirection(DcMotor.Direction.REVERSE);
+                // slow push mode
+                spinArm.setDirection(DcMotor.Direction.FORWARD);
                 spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
             }
             else if(gamepad2.left_bumper==true){
-                // fast throw mode
-                spinArm.setDirection(DcMotor.Direction.REVERSE);
-                spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
+                // fast push mode
+                spinArm.setDirection(DcMotor.Direction.FORWARD);
+                spinArm.setPower(SPIN_ARM_REVERSE_MAXSPEED);
                 Thread.sleep(SPIN_ARM_ROTATE_TIME);
                 spinArm.setPower(SPIN_ARM_STOP);
             }
@@ -189,7 +189,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 //            }
 //            else if(gamepad2.left_stick_y < (-1 * DEADZONE)){
 //                //gamepad 2 left joystick reverse
-//                leftHand.setPosition(leftHand.getPosition() - HAND_SPEED);
+//                leftHand.se// Position(leftHand.getPosition() - HAND_SPEED);
 //            }
 
 

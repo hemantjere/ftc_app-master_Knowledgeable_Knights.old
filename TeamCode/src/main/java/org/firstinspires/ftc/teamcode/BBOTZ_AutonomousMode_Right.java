@@ -114,7 +114,7 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
 
         // Rotate left ~40 degrees
         rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(600);
+        Thread.sleep(750);
         rightDrive.setPower(STOP_DRIVE);
         Thread.sleep(1000);
 
@@ -123,7 +123,7 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(4000);
+        Thread.sleep(5000);
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
     }

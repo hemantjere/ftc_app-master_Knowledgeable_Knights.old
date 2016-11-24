@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -57,8 +58,10 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 
     private double SPIN_ARM_FORWARD_MAXSPEED = 1d;
     private double SPIN_ARM_REVERSE_MAXSPEED = .7d;
-    private double SPIN_ARM_MINSPEED = .15d;
+    private double SPIN_ARM_MINSPEED = .3d;
     private double SPIN_ARM_STOP = 0d;
+    private double ZIPTIE_MOTOR_SPEED = 1d;
+    private double ZIPTIE_MOTOR_STOP = 0d;
     private double DEADZONE = .1d;
     private long SPIN_ARM_ROTATE_TIME = 200;
 
@@ -75,6 +78,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
     Servo rightArm = null;
     Servo leftHand = null;
     Servo rightHand = null;
+    DcMotor ziptieMotor = null;
 
     @Override
 
@@ -93,13 +97,13 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         // rightArm = hardwareMap.servo.get("right arm");
         leftHand = hardwareMap.servo.get("left hand");
         rightHand = hardwareMap.servo.get("right hand");
-
+        ziptieMotor = hardwareMap.dcMotor.get("ziptie motor");
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         spinArm.setDirection(DcMotor.Direction.FORWARD);
-
+        ziptieMotor.setDirection(DcMotor.Direction.REVERSE);
         // servo stuff
         // leftArm.scaleRange(0.2, 1.0);
         // rightArm.scaleRange(0.05, 0.8);
@@ -112,6 +116,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 
         // int leftHandDirection = -1;
         // int rightHandDirection = 1;
+        Boolean toggleYButton = false;
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -139,7 +144,10 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                 rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
             }
             else {
-                // speed up robot
+                // accelerate robot slowly (avoid slippage)
+//                leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
+//                rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
+//                Thread.sleep(200);
                 leftDrive.setPower(gamepad1.left_stick_y);
                 rightDrive.setPower(gamepad1.right_stick_y);
             }
@@ -171,6 +179,18 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
             }
             else {
                 spinArm.setPower(SPIN_ARM_STOP);
+            }
+
+            //Ziptie Motor setup
+            if(gamepad2.y==true){
+                toggleYButton = !toggleYButton;
+            }
+
+            if (toggleYButton==true) {
+                ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);
+            }
+            else {
+                ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);
             }
 
 //            // Hand control code

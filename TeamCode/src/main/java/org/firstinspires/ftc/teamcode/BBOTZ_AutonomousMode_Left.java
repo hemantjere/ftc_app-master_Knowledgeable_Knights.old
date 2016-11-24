@@ -95,7 +95,7 @@ public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
         // Advance 36", then stop
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(1900);
+        Thread.sleep(900);
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
         Thread.sleep(1000);
@@ -109,14 +109,14 @@ public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
         // Advance 30" to knock off big ball, then stop
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(1400);
+        Thread.sleep(2400);
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
         Thread.sleep(1000);
 
         // Rotate left ~40 degrees
         leftDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(600);
+        Thread.sleep(800);
         leftDrive.setPower(STOP_DRIVE);
         Thread.sleep(1000);
 
@@ -125,7 +125,7 @@ public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(4000);
+        Thread.sleep(5000);
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
     }

@@ -51,10 +51,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-
-@TeleOp(name="Template: Control OpMode", group="OpMode Control")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Template: Tank Drive Control OpMode", group="OpMode Control")  // @Autonomous(...) is the other common choice
 // @Disabled
-public class BBOTZ_OpMode_Control extends LinearOpMode {
+public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
     private double SPIN_ARM_FORWARD_MAXSPEED = 1d;
     private double SPIN_ARM_REVERSE_MAXSPEED = .7d;
@@ -64,6 +63,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
     private double ZIPTIE_MOTOR_STOP = 0d;
     private double DEADZONE = .1d;
     private long SPIN_ARM_ROTATE_TIME = 200;
+    private double ACCELERATION_RATE = .25;
 
     private float DRIVE_MULTIPLE = .2f;
 
@@ -81,7 +81,6 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
     DcMotor ziptieMotor = null;
 
     @Override
-
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -104,7 +103,9 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         spinArm.setDirection(DcMotor.Direction.FORWARD);
         ziptieMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        Boolean toggleYButton = false;
+        Boolean toggleYButtonZiptie = false;
+        Boolean toggleYButtonInverse = false;
+
         int motorCount = 0;
         float leftAccelerationRate = 0.0f;
         float rightAccelerationRate = 0.0f;
@@ -132,7 +133,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                         leftAccelerationRate = DRIVE_MULTIPLE;
                     }
                     leftDrive.setPower(gamepad1.left_stick_y * leftAccelerationRate);
-                    leftAccelerationRate += .1f;
+                    leftAccelerationRate += ACCELERATION_RATE;
                     sleep(200);
                 }
                 else if (gamepad1.left_stick_y == 0) {
@@ -145,13 +146,45 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                         rightAccelerationRate = DRIVE_MULTIPLE;
                     }
                     rightDrive.setPower(gamepad1.right_stick_y * rightAccelerationRate);
-                    rightAccelerationRate += .1f;
+                    rightAccelerationRate += ACCELERATION_RATE;
                     sleep(200);
                 }
                 else if (gamepad1.right_stick_y == 0) {
                     rightAccelerationRate = 0.0f;
                     rightDrive.setPower(0);
                 }
+            }
+
+            // Beacon press
+            if (gamepad1.dpad_up == true) {
+                // forward for beacon
+                leftDrive.setPower(-1);
+                rightDrive.setPower(-1);
+                sleep(1000);
+                leftDrive.setPower(0);
+                rightDrive.setPower(0);
+            }
+
+            if (gamepad1.dpad_down == true) {
+                // backward for beacon
+                leftDrive.setPower(1);
+                rightDrive.setPower(1);
+                sleep(1000);
+                leftDrive.setPower(0);
+                rightDrive.setPower(0);
+            }
+
+            // Inverse motors
+            if(gamepad1.y==true){
+                toggleYButtonInverse = !toggleYButtonInverse;
+            }
+            if (toggleYButtonInverse==true) {
+                leftDrive = hardwareMap.dcMotor.get("right drive wheel");
+                rightDrive = hardwareMap.dcMotor.get("left drive wheel");
+            }
+            else {
+                leftDrive = hardwareMap.dcMotor.get("left drive wheel");
+                rightDrive = hardwareMap.dcMotor.get("right drive wheel");
             }
 
 //            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
@@ -208,11 +241,12 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
             }
 
             //Ziptie Motor setup
-            if(gamepad2.y==true){
-                toggleYButton = !toggleYButton;
+            if(gamepad2.y == true){
+                toggleYButtonZiptie = !toggleYButtonZiptie;
+                sleep(200);
             }
 
-            if (toggleYButton==true) {
+            if (toggleYButtonZiptie == true) {
                 ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);
             }
             else {

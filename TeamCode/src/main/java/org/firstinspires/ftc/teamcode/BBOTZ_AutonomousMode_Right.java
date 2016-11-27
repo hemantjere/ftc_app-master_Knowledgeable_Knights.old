@@ -50,7 +50,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Autonomouse Backup Right", group="Autonomous mode")
+@Autonomous(name="Autonomous Backup Right", group="Autonomous mode")
 // @Disabled
 public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
 
@@ -58,7 +58,7 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
     private double STOP_DRIVE = 0d;
     private double SPIN_ARM_FORWARD_MAXSPEED = 1d;
     private double SPIN_ARM_STOP = 0d;
-    private long SPIN_ARM_ROTATE_TIME = 400;
+    private long SPIN_ARM_ROTATE_TIME = 800;
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();

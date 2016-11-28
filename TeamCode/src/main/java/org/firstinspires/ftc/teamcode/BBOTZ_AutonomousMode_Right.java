@@ -54,77 +54,33 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
 
-    private double MAX_DRIVE_SPEED = .2d;
-    private double STOP_DRIVE = 0d;
-    private double SPIN_ARM_FORWARD_MAXSPEED = 1d;
-    private double SPIN_ARM_STOP = 0d;
-    private long SPIN_ARM_ROTATE_TIME = 800;
-
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    DcMotor leftDrive = null;
-    DcMotor rightDrive = null;
-    DcMotor spinArm = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        /* eg: Initialize the hardware variables. Note that the strings used here as parameters
-         * to 'get' must correspond to the names assigned during the robot configuration
-         * step (using the FTC Robot Controller app on the phone).
-         */
-        leftDrive = hardwareMap.dcMotor.get("left drive wheel");
-        rightDrive = hardwareMap.dcMotor.get("right drive wheel");
-        spinArm = hardwareMap.dcMotor.get("spin arm");
-
-        // eg: Set the drive motor directions:
-        // "Reverse" the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
-        spinArm.setDirection(DcMotor.Direction.REVERSE);
-
+        BBOTZ_AutonomousMode_Base autonomousModeBase = new BBOTZ_AutonomousMode_Base(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
         // Advance 36", then stop
-        leftDrive.setPower(MAX_DRIVE_SPEED);
-        rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(1900);
-        leftDrive.setPower(STOP_DRIVE);
-        rightDrive.setPower(STOP_DRIVE);
-        Thread.sleep(1000);
+        autonomousModeBase.driveForward(900);
 
         // Launch ball
-        spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
-        Thread.sleep(SPIN_ARM_ROTATE_TIME);
-        spinArm.setPower(SPIN_ARM_STOP);
-        Thread.sleep(1000);
+        autonomousModeBase.launchBall();
 
         // Advance 30" to knock off big ball, then stop
-        leftDrive.setPower(MAX_DRIVE_SPEED);
-        rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(1400);
-        leftDrive.setPower(STOP_DRIVE);
-        rightDrive.setPower(STOP_DRIVE);
-        Thread.sleep(1000);
+        autonomousModeBase.driveForward(1400);
 
         // Rotate left ~40 degrees
-        rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(750);
-        rightDrive.setPower(STOP_DRIVE);
-        Thread.sleep(1000);
+        autonomousModeBase.turnLeft(750);
 
         // Backup up ramp ~70"
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftDrive.setPower(MAX_DRIVE_SPEED);
-        rightDrive.setPower(MAX_DRIVE_SPEED);
-        Thread.sleep(5000);
-        leftDrive.setPower(STOP_DRIVE);
-        rightDrive.setPower(STOP_DRIVE);
+        autonomousModeBase.driveBackward(5000);
     }
 }

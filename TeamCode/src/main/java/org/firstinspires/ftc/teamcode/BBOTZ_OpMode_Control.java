@@ -65,7 +65,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
     private double DEADZONE = .1d;
     private long SPIN_ARM_ROTATE_TIME = 200;
 
-    private double DRIVE_MULTIPLE = .2d;
+    private float DRIVE_MULTIPLE = .2f;
 
     private double HAND_SPEED = .01d;
 
@@ -93,30 +93,21 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
         leftDrive = hardwareMap.dcMotor.get("left drive wheel");
         rightDrive = hardwareMap.dcMotor.get("right drive wheel");
         spinArm = hardwareMap.dcMotor.get("spin arm");
-        // leftArm = hardwareMap.servo.get("left arm");
-        // rightArm = hardwareMap.servo.get("right arm");
         leftHand = hardwareMap.servo.get("left hand");
         rightHand = hardwareMap.servo.get("right hand");
         ziptieMotor = hardwareMap.dcMotor.get("ziptie motor");
+
         // eg: Set the drive motor directions:
         // "Reverse" the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         spinArm.setDirection(DcMotor.Direction.FORWARD);
         ziptieMotor.setDirection(DcMotor.Direction.REVERSE);
-        // servo stuff
-        // leftArm.scaleRange(0.2, 1.0);
-        // rightArm.scaleRange(0.05, 0.8);
 
-        // leftHand.scaleRange(0.0, 0.6);
-        // rightHand.scaleRange(0.3, 1.0);
-
-        // leftHand.setPosition(1.0);
-        // rightHand.setPosition(0.0);
-
-        // int leftHandDirection = -1;
-        // int rightHandDirection = 1;
         Boolean toggleYButton = false;
+        int motorCount = 0;
+        float leftAccelerationRate = 0.0f;
+        float rightAccelerationRate = 0.0f;
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -124,33 +115,68 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            // double leftHandPos = leftHand.getPosition();
-            // double rightHandPos = rightHand.getPosition();
 
-//            // get direction does not display unless you set the direction
-//            telemetry.addData("Status", "Run Time: " + runtime.toString());
-//            if (leftHandPos != Double.NaN) {
-//                telemetry.addData("Status", "Left Hand: " + leftHandPos);
-//            }
-//            if (rightHandPos != Double.NaN) {
-//                telemetry.addData("Status", "Right Hand: " + rightHandPos);
-//            }
-//            telemetry.update();
+            // get direction does not display unless you set the direction
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Status", "gamepad1: " + gamepad1.toString());
+            telemetry.update();
 
-            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
             if (gamepad1.left_bumper == true) {
                 // slow down robot
                 leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
                 rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
             }
             else {
-                // accelerate robot slowly (avoid slippage)
+                if (gamepad1.left_stick_y != 0) {
+                    if (leftAccelerationRate == 0.0f) {
+                        leftAccelerationRate = DRIVE_MULTIPLE;
+                    }
+                    leftDrive.setPower(gamepad1.left_stick_y * leftAccelerationRate);
+                    leftAccelerationRate += .1f;
+                    sleep(200);
+                }
+                else if (gamepad1.left_stick_y == 0) {
+                    leftAccelerationRate = 0.0f;
+                    leftDrive.setPower(0);
+                }
+
+                if (gamepad1.right_stick_y != 0) {
+                    if (rightAccelerationRate == 0.0f) {
+                        rightAccelerationRate = DRIVE_MULTIPLE;
+                    }
+                    rightDrive.setPower(gamepad1.right_stick_y * rightAccelerationRate);
+                    rightAccelerationRate += .1f;
+                    sleep(200);
+                }
+                else if (gamepad1.right_stick_y == 0) {
+                    rightAccelerationRate = 0.0f;
+                    rightDrive.setPower(0);
+                }
+            }
+
+//            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
+//            if (gamepad1.left_bumper == true) {
+//                // slow down robot
 //                leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
 //                rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
-//                Thread.sleep(200);
-                leftDrive.setPower(gamepad1.left_stick_y);
-                rightDrive.setPower(gamepad1.right_stick_y);
-            }
+//            }
+//            else if(motorCount == 1) {
+//                // accelerate robot slowly (avoid slippage)
+//                leftDrive.setPower(gamepad1.left_stick_y);
+//                rightDrive.setPower(gamepad1.right_stick_y);
+//                sleep(250);
+//            }
+//            else {
+//                leftDrive.setPower(gamepad1.left_stick_y);
+//                rightDrive.setPower(gamepad1.right_stick_y);
+//            }
+//
+//            if ((gamepad1.left_stick_y == 0) && gamepad1.right_stick_y == 0){
+//                motorCount=0;
+//            }
+//            if((gamepad1.left_stick_y != 0) || (gamepad1.right_stick_y != 0)){
+//                motorCount++;
+//            }
 
             // Spin Arm setup
             if(gamepad2.right_trigger> DEADZONE){
@@ -162,7 +188,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                 // fast throw mode
                 spinArm.setDirection(DcMotor.Direction.REVERSE);
                 spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
-                Thread.sleep(SPIN_ARM_ROTATE_TIME);
+                sleep(SPIN_ARM_ROTATE_TIME);
                 spinArm.setPower(SPIN_ARM_STOP);
             }
             else if(gamepad2.left_trigger> DEADZONE){
@@ -174,7 +200,7 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
                 // fast push mode
                 spinArm.setDirection(DcMotor.Direction.FORWARD);
                 spinArm.setPower(SPIN_ARM_REVERSE_MAXSPEED);
-                Thread.sleep(SPIN_ARM_ROTATE_TIME);
+                sleep(SPIN_ARM_ROTATE_TIME);
                 spinArm.setPower(SPIN_ARM_STOP);
             }
             else {
@@ -192,53 +218,6 @@ public class BBOTZ_OpMode_Control extends LinearOpMode {
             else {
                 ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);
             }
-
-//            // Hand control code
-//            if(gamepad2.right_stick_y > DEADZONE){
-//                //gamepad 2 right joystick forward
-//                rightHand.setPosition(rightHand.getPosition() - HAND_SPEED);
-//            }
-//            else if(gamepad2.right_stick_y < (-1 * DEADZONE)){
-//                //gamepad 2 right joystick reverse
-//                rightHand.setPosition(rightHand.getPosition() + HAND_SPEED);
-//            }
-//
-//            if(gamepad2.left_stick_y > DEADZONE){
-//                //gamepad 2 left joystick forward
-//                leftHand.setPosition(leftHand.getPosition() + HAND_SPEED);
-//            }
-//            else if(gamepad2.left_stick_y < (-1 * DEADZONE)){
-//                //gamepad 2 left joystick reverse
-//                leftHand.se// Position(leftHand.getPosition() - HAND_SPEED);
-//            }
-
-
-//            if(gamepad1.right_trigger > DEADZONE){
-//                rightHand.setPosition(rightHand.getPosition() + (HAND_SPEED * rightHandDirection));
-//            }
-//            else if ((gamepad1.right_trigger != 0) && (gamepad1.right_trigger < DEADZONE)) {
-//                rightHandDirection *= -1;
-//            }
-//            else if(gamepad1.left_trigger > DEADZONE){
-//                leftHand.setPosition((leftHand.getPosition() + HAND_SPEED) * leftHandDirection);
-//            }
-//            else if ((gamepad1.left_trigger != 0) && (gamepad1.left_trigger < DEADZONE)) {
-//                leftHandDirection *= -1;
-//            }
-
-//            // Left/Right arm for cap ball lift
-//            if(gamepad1.right_trigger>0.25){
-//                //leftArm.setDirection(Servo.Direction.FORWARD);
-//                leftArm.setPosition(leftArm.getPosition() - .1d);
-//                //rightArm.setDirection(Servo.Direction.REVERSE);
-//                rightArm.setPosition(rightArm.getPosition() + .1d);
-//            }
-//            else if(gamepad1.left_trigger>0.25){
-//                //leftArm.setDirection(Servo.Direction.REVERSE);
-//                leftArm.setPosition(leftArm.getPosition() + .1d);
-//                //rightArm.setDirection(Servo.Direction.FORWARD);
-//                rightArm.setPosition(rightArm.getPosition() - .1d);
-//            }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }

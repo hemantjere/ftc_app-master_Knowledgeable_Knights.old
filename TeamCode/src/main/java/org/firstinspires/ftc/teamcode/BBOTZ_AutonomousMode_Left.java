@@ -34,11 +34,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -58,7 +53,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
 
-    BBOTZ_AutonomousMode_Base autonomousModeBase;
+    BBOTZ_AutonomousMode_Common_Methods autonomousModeCommonMethods;
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -68,34 +63,28 @@ public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        autonomousModeBase = new BBOTZ_AutonomousMode_Base(hardwareMap);
+        autonomousModeCommonMethods = new BBOTZ_AutonomousMode_Common_Methods(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
         // Advance 36", then stop
-        autonomousModeBase.driveForward(700);
+        autonomousModeCommonMethods.driveForward(700);
 
         // Launch ball
-        autonomousModeBase.launchBall();
+        autonomousModeCommonMethods.launchBall();
 
         // Turn to knock off ball
-        autonomousModeBase.tankTurnLeft(340);
+        autonomousModeCommonMethods.tankTurnLeft(340);
 
-        // Advance 30" to knock off big ball, then stop
-        autonomousModeBase.driveForward(2300);
-
-//        //Go forward to knock off ball
-//        autonomousModeBase.driveForward(600);
+        // Advance 30" to go past cap ball
+        autonomousModeCommonMethods.driveForward(2300);
 
         // Turn to knock off ball
-        autonomousModeBase.tankTurnRight(1000);
-
-//        //Turn to go on ramp
-//        autonomousModeBase.tankTurnLeft(400);
+        autonomousModeCommonMethods.tankTurnRight(1000);
 
         // Backup up ramp ~70"
-        autonomousModeBase.driveBackward(4000);
+        autonomousModeCommonMethods.driveBackward(8000);
     }
 }

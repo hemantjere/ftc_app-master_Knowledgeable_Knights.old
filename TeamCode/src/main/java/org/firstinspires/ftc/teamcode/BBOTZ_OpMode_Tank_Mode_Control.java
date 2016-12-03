@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
-    private double SPIN_ARM_FORWARD_MAXSPEED = 0.8d;
+    private double SPIN_ARM_FORWARD_MAXSPEED = .9d;
     private double SPIN_ARM_REVERSE_MAXSPEED = .7d;
     private double SPIN_ARM_MINSPEED = .3d;
     private double SPIN_ARM_STOP = 0d;
@@ -64,6 +64,8 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
     private double DEADZONE = .1d;
     private long SPIN_ARM_ROTATE_TIME = 200;
     private double ACCELERATION_RATE = .25;
+    private long BEACON_DPAD_RUN_TIME = 500;
+    private long Y_TOGGLE_RUN_TIME = 800;
 
     private float DRIVE_MULTIPLE = .2f;
 
@@ -130,31 +132,6 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
             else {
                 leftDrive.setPower(gamepad1.left_stick_y);
                 rightDrive.setPower(gamepad1.right_stick_y);
-//                if (gamepad1.left_stick_y != 0) {
-//                    if (leftAccelerationRate == 0.0f) {
-//                        leftAccelerationRate = DRIVE_MULTIPLE;
-//                    }
-//                    leftDrive.setPower(gamepad1.left_stick_y * leftAccelerationRate);
-//                    leftAccelerationRate += ACCELERATION_RATE;
-//                    sleep(200);
-//                }
-//                else if (gamepad1.left_stick_y == 0) {
-//                    leftAccelerationRate = 0.0f;
-//                    leftDrive.setPower(0);
-//                }
-//
-//                if (gamepad1.right_stick_y != 0) {
-//                    if (rightAccelerationRate == 0.0f) {
-//                        rightAccelerationRate = DRIVE_MULTIPLE;
-//                    }
-//                    rightDrive.setPower(gamepad1.right_stick_y * rightAccelerationRate);
-//                    rightAccelerationRate += ACCELERATION_RATE;
-//                    sleep(200);
-//                }
-//                else if (gamepad1.right_stick_y == 0) {
-//                    rightAccelerationRate = 0.0f;
-//                    rightDrive.setPower(0);
-//                }
             }
 
             // Beacon press
@@ -162,7 +139,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 // forward for beacon
                 leftDrive.setPower(-1);
                 rightDrive.setPower(-1);
-                sleep(1000);
+                sleep(BEACON_DPAD_RUN_TIME);
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
@@ -171,47 +148,10 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 // backward for beacon
                 leftDrive.setPower(1);
                 rightDrive.setPower(1);
-                sleep(1000);
+                sleep(BEACON_DPAD_RUN_TIME);
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
-
-//            // Inverse motors
-//            if(gamepad1.y==true){
-//                toggleYButtonInverse = !toggleYButtonInverse;
-//            }
-//            if (toggleYButtonInverse==true) {
-//                leftDrive = hardwareMap.dcMotor.get("right drive wheel");
-//                rightDrive = hardwareMap.dcMotor.get("left drive wheel");
-//            }
-//            else {
-//                leftDrive = hardwareMap.dcMotor.get("left drive wheel");
-//                rightDrive = hardwareMap.dcMotor.get("right drive wheel");
-//            }
-
-//            // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
-//            if (gamepad1.left_bumper == true) {
-//                // slow down robot
-//                leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
-//                rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
-//            }
-//            else if(motorCount == 1) {
-//                // accelerate robot slowly (avoid slippage)
-//                leftDrive.setPower(gamepad1.left_stick_y);
-//                rightDrive.setPower(gamepad1.right_stick_y);
-//                sleep(250);
-//            }
-//            else {
-//                leftDrive.setPower(gamepad1.left_stick_y);
-//                rightDrive.setPower(gamepad1.right_stick_y);
-//            }
-//
-//            if ((gamepad1.left_stick_y == 0) && gamepad1.right_stick_y == 0){
-//                motorCount=0;
-//            }
-//            if((gamepad1.left_stick_y != 0) || (gamepad1.right_stick_y != 0)){
-//                motorCount++;
-//            }
 
             // Spin Arm setup
             if(gamepad2.right_trigger> DEADZONE){
@@ -245,7 +185,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
             //Ziptie Motor setup
             if(gamepad2.y == true){
                 toggleYButtonZiptie = !toggleYButtonZiptie;
-                sleep(500);
+                sleep(Y_TOGGLE_RUN_TIME);
             }
 
             if (toggleYButtonZiptie == true) {

@@ -55,7 +55,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
 
-    private double SPIN_ARM_FORWARD_MAXSPEED = 1d;
+    private double SPIN_ARM_FORWARD_MAXSPEED = .9d;
     private double SPIN_ARM_REVERSE_MAXSPEED = .7d;
     private double SPIN_ARM_MINSPEED = .3d;
     private double SPIN_ARM_STOP = 0d;
@@ -63,6 +63,8 @@ public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
     private double ZIPTIE_MOTOR_STOP = 0d;
     private double DEADZONE = .1d;
     private long SPIN_ARM_ROTATE_TIME = 200;
+    private long BEACON_DPAD_RUN_TIME = 500;
+    private long Y_TOGGLE_RUN_TIME = 800;
 
     private float DRIVE_MULTIPLE = .2f;
 
@@ -121,23 +123,6 @@ public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
             telemetry.addData("Status", "gamepad1: " + gamepad1.toString());
             telemetry.update();
 
-            //One Stick Control
-//            if(gamepad1.right_stick_y != 0){
-//                //forward and backward
-//                leftDrive.setPower(gamepad1.right_stick_y);
-//                rightDrive.setPower(gamepad1.right_stick_y);
-//            }
-//
-//            if(gamepad1.right_stick_x != 0){
-//                //rotating (tank turn)
-//                leftDrive.setPower(gamepad1.right_stick_x);
-//                rightDrive.setPower(-1 * gamepad1.right_stick_x);
-//            }
-//
-//            if(gamepad1.right_stick_y == 0 && gamepad1.right_stick_x == 0){
-//                leftDrive.setPower(0);
-//                rightDrive.setPower(0);
-//            }
             if (gamepad1.left_bumper == true) {
                 leftDrive.setPower((gamepad1.right_stick_y - gamepad1.right_stick_x)*DRIVE_MULTIPLE);
                 rightDrive.setPower((gamepad1.right_stick_y + gamepad1.right_stick_x)*DRIVE_MULTIPLE);
@@ -151,7 +136,7 @@ public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
                 // forward for beacon
                 leftDrive.setPower(-1);
                 rightDrive.setPower(-1);
-                sleep(1000);
+                sleep(BEACON_DPAD_RUN_TIME);
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
@@ -160,33 +145,10 @@ public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
                 // backward for beacon
                 leftDrive.setPower(1);
                 rightDrive.setPower(1);
-                sleep(1000);
+                sleep(BEACON_DPAD_RUN_TIME);
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
-
-
-            //Inverse Motors : Decided not to do with one stick
-//                leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
-//                rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
-//            }
-//            else if(motorCount == 1) {
-//                // accelerate robot slowly (avoid slippage)
-//                leftDrive.setPower(gamepad1.left_stick_y);
-//                rightDrive.setPower(gamepad1.right_stick_y);
-//                sleep(250);
-//            }
-//            else {
-//                leftDrive.setPower(gamepad1.left_stick_y);
-//                rightDrive.setPower(gamepad1.right_stick_y);
-//            }
-//
-//            if ((gamepad1.left_stick_y == 0) && gamepad1.right_stick_y == 0){
-//                motorCount=0;
-//            }
-//            if((gamepad1.left_stick_y != 0) || (gamepad1.right_stick_y != 0)){
-//                motorCount++;
-//            }
 
             // Spin Arm setup
             if(gamepad2.right_trigger> DEADZONE){
@@ -220,7 +182,7 @@ public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
             //Ziptie Motor setup
             if(gamepad2.y==true){
                 toggleYButtonZiptie = !toggleYButtonZiptie;
-                sleep(500);
+                sleep(Y_TOGGLE_RUN_TIME);
             }
 
             if (toggleYButtonZiptie==true) {

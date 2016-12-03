@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class BBOTZ_AutonomousMode_Base {
+public class BBOTZ_AutonomousMode_Common_Methods {
 
     private double MAX_DRIVE_SPEED = .2d;
     private double STOP_DRIVE = 0d;
@@ -13,8 +13,8 @@ public class BBOTZ_AutonomousMode_Base {
     private double SPIN_ARM_STOP = 0d;
     private long SPIN_ARM_SLOW_ROTATE_TIME = 500;
     private long SPIN_ARM_FAST_ROTATE_TIME = 800;
-    private long ZIPTIE_MOTOR_SPEED = 1;
-    private long ZIPTIE_MOTOR_STOP = 0;
+    private double ZIPTIE_MOTOR_SPEED = 1d;
+    private double ZIPTIE_MOTOR_STOP = 0d;
 
     private long STOP_TIME = 500;
 
@@ -24,7 +24,8 @@ public class BBOTZ_AutonomousMode_Base {
     DcMotor rightDrive = null;
     DcMotor spinArm = null;
     DcMotor ziptieMotor = null;
-    BBOTZ_AutonomousMode_Base(HardwareMap hardwareMap) {
+
+    BBOTZ_AutonomousMode_Common_Methods(HardwareMap hardwareMap) {
         this.leftDrive = leftDrive;
 
         this.rightDrive = rightDrive;
@@ -43,6 +44,7 @@ public class BBOTZ_AutonomousMode_Base {
         leftDrive.setDirection(DcMotor.Direction.REVERSE);  // Set to REVERSE if using AndyMark motors
         rightDrive.setDirection(DcMotor.Direction.FORWARD); // Set to FORWARD if using AndyMark motors
         spinArm.setDirection(DcMotor.Direction.REVERSE);
+        ziptieMotor.setDirection(DcMotor.Direction.REVERSE);
 
     }
 
@@ -100,11 +102,13 @@ public class BBOTZ_AutonomousMode_Base {
 
     private void startSpinArm(double spinSpeed, long spinTime) throws InterruptedException {
         spinArm.setPower(spinSpeed);
+        ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);
         Thread.sleep(spinTime);
     }
 
     private void stopSpinArm() throws InterruptedException {
         spinArm.setPower(SPIN_ARM_STOP);
+        ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);
         Thread.sleep(STOP_TIME);
     }
 

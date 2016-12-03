@@ -34,7 +34,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -62,25 +61,30 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        BBOTZ_AutonomousMode_Base autonomousModeBase = new BBOTZ_AutonomousMode_Base(hardwareMap);
+        BBOTZ_AutonomousMode_Common_Methods autonomousModeCommonMethods = new BBOTZ_AutonomousMode_Common_Methods(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
         // Advance 36", then stop
-        autonomousModeBase.driveForward(700);
+        autonomousModeCommonMethods.driveForward(700);
 
         // Launch ball
-        autonomousModeBase.launchBall();
+        autonomousModeCommonMethods.launchBall();
 
-        // Advance 30" to knock off big ball, then stop
-        autonomousModeBase.driveForward(1400);
+        //Turn to knock off ball
+        autonomousModeCommonMethods.tankTurnRight(340);
 
-        // Rotate left ~40 degrees
-        autonomousModeBase.turnLeft(750);
+        // Advance 30" to go past cap ball
+        autonomousModeCommonMethods.driveForward(2300);
+
+        // Turn to knock off ball
+        // Note: the value does not match the mirror autonomous mode because
+        // the strengh of the motors are not equal.
+        autonomousModeCommonMethods.tankTurnLeft(1400);
 
         // Backup up ramp ~70"
-        autonomousModeBase.driveBackward(5000);
+        autonomousModeCommonMethods.driveBackward(8000);
     }
 }

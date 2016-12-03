@@ -75,17 +75,27 @@ public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
         runtime.reset();
 
         // Advance 36", then stop
-        autonomousModeBase.driveForward(900);
+        autonomousModeBase.driveForward(700);
 
         // Launch ball
         autonomousModeBase.launchBall();
 
-        // Advance 30" to knock off big ball, then stop
-        autonomousModeBase.driveForward(1400);
+        // Turn to knock off ball
+        autonomousModeBase.tankTurnLeft(340);
 
-        // Rotate right ~40 degrees
-        autonomousModeBase.turnRight(750);
+        // Advance 30" to knock off big ball, then stop
+        autonomousModeBase.driveForward(2300);
+
+//        //Go forward to knock off ball
+//        autonomousModeBase.driveForward(600);
+
+        // Turn to knock off ball
+        autonomousModeBase.tankTurnRight(1000);
+
+//        //Turn to go on ramp
+//        autonomousModeBase.tankTurnLeft(400);
 
         // Backup up ramp ~70"
-        autonomousModeBase.driveBackward(5000);    }
+        autonomousModeBase.driveBackward(4000);
+    }
 }

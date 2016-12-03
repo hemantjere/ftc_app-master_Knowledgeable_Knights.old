@@ -69,7 +69,7 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         runtime.reset();
 
         // Advance 36", then stop
-        autonomousModeBase.driveForward(900);
+        autonomousModeBase.driveForward(700);
 
         // Launch ball
         autonomousModeBase.launchBall();

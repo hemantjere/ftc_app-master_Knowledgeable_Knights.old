@@ -220,7 +220,7 @@ public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
             //Ziptie Motor setup
             if(gamepad2.y==true){
                 toggleYButtonZiptie = !toggleYButtonZiptie;
-                sleep(200);
+                sleep(500);
             }
 
             if (toggleYButtonZiptie==true) {

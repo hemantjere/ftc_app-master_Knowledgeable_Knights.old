@@ -156,66 +156,41 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
             }
 
             // Spin Arm setup
-            if(gamepad2.left_trigger> DEADZONE){
+            if(gamepad2.right_bumper == true){
+                // automatic throw mode
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
+                spinArm.setTargetPosition(300);
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
+                spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
+                while(spinArm.isBusy()) {
+                    // wait for arm to throw
+                }
+                spinArm.setPower(SPIN_ARM_STOP);
+            }
+            else if(gamepad2.left_bumper == true){
+                // automatic home mod
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
+                spinArm.setTargetPosition(685);
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
+                spinArm.setPower(SPIN_ARM_MINSPEED);
+                while(spinArm.isBusy()) {
+                    // wait for arm to throw
+                }
+                spinArm.setPower(SPIN_ARM_STOP);
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+            else if(gamepad2.right_trigger > DEADZONE){
                 // manual slow throw mode
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 spinArm.setDirection(DcMotor.Direction.REVERSE);
                 spinArm.setPower(gamepad2.right_trigger*SPIN_ARM_MINSPEED);
             }
-            else if(gamepad2.left_bumper==true){
+            else if(gamepad2.left_trigger > DEADZONE){
                 // manual fast throw mode
-                spinArm.setDirection(DcMotor.Direction.REVERSE);
-                spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
-                sleep(SPIN_ARM_ROTATE_TIME);
-                spinArm.setPower(SPIN_ARM_STOP);
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                spinArm.setDirection(DcMotor.Direction.FORWARD);
+                spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
             }
-            else if(gamepad2.right_trigger> DEADZONE){
-                // automatic throw mode
-                spinArm.setTargetPosition(310);
-                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
-                spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
-                while(spinArm.isBusy()) {
-                    // wait for arm to throw
-                }
-                spinArm.setPower(SPIN_ARM_STOP);
-            }
-            else if(gamepad2.right_bumper==true){
-                // automatic home mod
-                spinArm.setTargetPosition(620);
-                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
-                spinArm.setPower(SPIN_ARM_MINSPEED);
-                while(spinArm.isBusy()) {
-                    // wait for arm to throw
-                }
-                spinArm.setPower(SPIN_ARM_STOP);
-
-                spinArm.setTargetPosition(930);
-                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
-                spinArm.setPower(SPIN_ARM_MINSPEED);
-                while(spinArm.isBusy()) {
-                    // wait for arm to throw
-                }
-                spinArm.setPower(SPIN_ARM_STOP);
-
-                spinArm.setTargetPosition(0);
-                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
-                spinArm.setPower(SPIN_ARM_MINSPEED);
-                while(spinArm.isBusy()) {
-                    // wait for arm to throw
-                }
-                spinArm.setPower(SPIN_ARM_STOP);
-            }
-//            else if(gamepad2.left_trigger> DEADZONE){
-//                // slow push mode
-//                spinArm.setDirection(DcMotor.Direction.FORWARD);
-//                spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
-//            }
-//            else if(gamepad2.left_bumper==true){
-//                // fast push mode
-//                spinArm.setDirection(DcMotor.Direction.FORWARD);
-//                spinArm.setPower(SPIN_ARM_REVERSE_MAXSPEED);
-//                sleep(SPIN_ARM_ROTATE_TIME);
-//                spinArm.setPower(SPIN_ARM_STOP);
-//            }
             else {
                 spinArm.setPower(SPIN_ARM_STOP);
             }
@@ -231,6 +206,12 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
             }
             else {
                 ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);
+            }
+
+            //Reset button
+            if(gamepad2.x == true){
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
             }
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop

@@ -67,6 +67,10 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        // reset encoder
+        autonomousModeCommonMethods.resetEncoder();
+
+
         // Advance 36", then stop
         autonomousModeCommonMethods.driveForward(700);
 

@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -52,7 +53,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Template: Single Joystick Control OpMode", group="OpMode Control")  // @Autonomous(...) is the other common choice
-// @Disabled
+@Disabled
 public class BBOTZ_OpMode__Single_Joystick_Control extends LinearOpMode {
 
     private double SPIN_ARM_FORWARD_MAXSPEED = .9d;

@@ -56,9 +56,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
-    private double SPIN_ARM_FORWARD_MAXSPEED = .9d;
-    private double SPIN_ARM_REVERSE_MAXSPEED = .7d;
-    private double SPIN_ARM_MINSPEED = .3d;
+    private double SPIN_ARM_MAXSPEED = .9d;
+    private double SPIN_ARM_MINSPEED = .2d;
     private double SPIN_ARM_STOP = 0d;
     private double ZIPTIE_MOTOR_SPEED = 1d;
     private double ZIPTIE_MOTOR_STOP = 0d;
@@ -124,6 +123,9 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
             // get direction does not display unless you set the direction
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Status", "gamepad1: " + gamepad1.toString());
+            telemetry.addData("Status", "gamepad2: " + gamepad2.toString());
+            telemetry.addData("Status", "Arm Position:" + spinArm.getCurrentPosition());
+
             telemetry.update();
 
             if (gamepad1.left_bumper == true) {
@@ -158,26 +160,77 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
             // Spin Arm setup
             if(gamepad2.right_bumper == true){
                 // automatic throw mode
+                int prevPos = Integer.MAX_VALUE;
+
+                ziptieRun();
+
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
-                spinArm.setTargetPosition(300);
+                spinArm.setTargetPosition(330);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
-                spinArm.setPower(SPIN_ARM_FORWARD_MAXSPEED);
-                while(spinArm.isBusy()) {
+                spinArm.setPower(SPIN_ARM_MAXSPEED);
+                long startTime = System.currentTimeMillis();
+                while (spinArm.isBusy()) {
                     // wait for arm to throw
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime > startTime + 50) {
+                        if (prevPos == spinArm.getCurrentPosition()) {
+                            break;
+                        }
+
+                        startTime = currentTime;
+                        prevPos = spinArm.getCurrentPosition();
+                    }
+
+                    if (spinArm.getCurrentPosition() >= 330) {
+                        break;
+                    }
+
+                    telemetry.update();
+
                 }
+
+                ziptieStop();
+
                 spinArm.setPower(SPIN_ARM_STOP);
+
+                sleep(1000);
             }
             else if(gamepad2.left_bumper == true){
-                // automatic home mod
+                // automatic home mode
+                int prevPos = Integer.MAX_VALUE;
+
+                ziptieRun();
+
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
-                spinArm.setTargetPosition(685);
+                spinArm.setTargetPosition(690);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
                 spinArm.setPower(SPIN_ARM_MINSPEED);
-                while(spinArm.isBusy()) {
+                long startTime = System.currentTimeMillis();
+                while (spinArm.isBusy()) {
                     // wait for arm to throw
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime > startTime + 100) {
+                        if (prevPos == spinArm.getCurrentPosition()) {
+                            break;
+                        }
+
+                        startTime = currentTime;
+                        prevPos = spinArm.getCurrentPosition();
+                    }
+
+                    if (spinArm.getCurrentPosition() >= 690) {
+                        break;
+                    }
+
+                    telemetry.update();
                 }
+
+                ziptieStop();
+
                 spinArm.setPower(SPIN_ARM_STOP);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                sleep(1000);
             }
             else if(gamepad2.right_trigger > DEADZONE){
                 // manual slow throw mode
@@ -185,12 +238,14 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 spinArm.setDirection(DcMotor.Direction.REVERSE);
                 spinArm.setPower(gamepad2.right_trigger*SPIN_ARM_MINSPEED);
             }
+            /*
+            Disable this because going in the opposite direction makes the encoder go negative.
             else if(gamepad2.left_trigger > DEADZONE){
                 // manual fast throw mode
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 spinArm.setDirection(DcMotor.Direction.FORWARD);
                 spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
-            }
+            }*/
             else {
                 spinArm.setPower(SPIN_ARM_STOP);
             }
@@ -216,5 +271,13 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
             idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
         }
+    }
+
+    public void ziptieRun (){
+        ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);
+    }
+
+    public void ziptieStop (){
+        ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);
     }
 }

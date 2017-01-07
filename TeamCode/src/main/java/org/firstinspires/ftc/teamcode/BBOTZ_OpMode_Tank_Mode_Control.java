@@ -40,23 +40,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
 @TeleOp(name="Template: Tank Drive Control OpMode", group="OpMode Control")  // @Autonomous(...) is the other common choice
+
 // @Disabled
 public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
-    private double SPIN_ARM_MAXSPEED = .9d;
+    private double SPIN_ARM_MAXSPEED = .8d;
     private double SPIN_ARM_MINSPEED = .2d;
     private double SPIN_ARM_STOP = 0d;
     private double ZIPTIE_MOTOR_SPEED = 1d;
@@ -87,10 +76,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        /* eg: Initialize the hardware variables. Note that the strings used here as parameters
-         * to 'get' must correspond to the names assigned during the robot configuration
-         * step (using the FTC Robot Controller app on the phone).
-         */
+        //Initialize hardware
         leftDrive = hardwareMap.dcMotor.get("left drive wheel");
         rightDrive = hardwareMap.dcMotor.get("right drive wheel");
         spinArm = hardwareMap.dcMotor.get("spin arm");
@@ -98,58 +84,57 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
         rightHand = hardwareMap.servo.get("right hand");
         ziptieMotor = hardwareMap.dcMotor.get("ziptie motor");
 
-        // eg: Set the drive motor directions:
-        // "Reverse" the motor that runs backwards when connected directly to the battery
+        //Set directions for motors
         leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
         spinArm.setDirection(DcMotor.Direction.REVERSE);
         ziptieMotor.setDirection(DcMotor.Direction.REVERSE);
 
+        //Variable for y toggle
         Boolean toggleYButtonZiptie = false;
 
-        //Remove once added to auto mode
+        //Setup encoder variables
         DcMotorController spinArmController = spinArm.getController();
         int spinArmPort = spinArm.getPortNumber();
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
-        spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Wait for the game to start (driver presses PLAY)
+        //Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
+        //Run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // get direction does not display unless you set the direction
+            //Telemetry display on driver station
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Status", "gamepad1: " + gamepad1.toString());
             telemetry.addData("Status", "gamepad2: " + gamepad2.toString());
             telemetry.addData("Status", "Arm Position:" + spinArm.getCurrentPosition());
-
             telemetry.update();
 
+            //Driving controls
             if (gamepad1.left_bumper == true) {
-                // slow down robot
+                //Slow speed
                 leftDrive.setPower(gamepad1.left_stick_y*DRIVE_MULTIPLE);
                 rightDrive.setPower(gamepad1.right_stick_y*DRIVE_MULTIPLE);
             }
             else {
+                //Normal speed
                 leftDrive.setPower(gamepad1.left_stick_y);
                 rightDrive.setPower(gamepad1.right_stick_y);
             }
 
-            // Beacon press
+            //Beacon press forward & backward movement
             if (gamepad1.dpad_up == true) {
-                // forward for beacon
+                //Forward movement for BEACON_DPAD_RUN_TIME
                 leftDrive.setPower(-1);
                 rightDrive.setPower(-1);
                 sleep(BEACON_DPAD_RUN_TIME);
                 leftDrive.setPower(0);
                 rightDrive.setPower(0);
             }
-
             if (gamepad1.dpad_down == true) {
-                // backward for beacon
+                //Backward movement for BEACON_DPAD_RUN_TIME
                 leftDrive.setPower(1);
                 rightDrive.setPower(1);
                 sleep(BEACON_DPAD_RUN_TIME);
@@ -157,18 +142,23 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 rightDrive.setPower(0);
             }
 
-            // Spin Arm setup
+            //Encoder movement
             if(gamepad2.right_bumper == true){
-                // automatic throw mode
+                //automatic throw mode
+
                 int prevPos = Integer.MAX_VALUE;
 
+                //Run ziptie motor during arm movement
                 ziptieRun();
 
+                //330 is launch position
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
                 spinArm.setTargetPosition(330);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
                 spinArm.setPower(SPIN_ARM_MAXSPEED);
                 long startTime = System.currentTimeMillis();
+
+                //while() loop for motor burnout prevention
                 while (spinArm.isBusy()) {
                     // wait for arm to throw
                     long currentTime = System.currentTimeMillis();
@@ -189,23 +179,30 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
                 }
 
+                //Stop ziptie motor during arm movement
                 ziptieStop();
 
+                //Stop Spin Arm
                 spinArm.setPower(SPIN_ARM_STOP);
 
+                //One second delay
                 sleep(1000);
             }
             else if(gamepad2.left_bumper == true){
-                // automatic home mode
+                // automatic home reset mode
                 int prevPos = Integer.MAX_VALUE;
 
+                //Run ziptie motor during arm movement
                 ziptieRun();
 
+                //690 is home position
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
                 spinArm.setTargetPosition(690);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
                 spinArm.setPower(SPIN_ARM_MINSPEED);
                 long startTime = System.currentTimeMillis();
+
+                //while() loop for motor burnout prevention
                 while (spinArm.isBusy()) {
                     // wait for arm to throw
                     long currentTime = System.currentTimeMillis();
@@ -225,27 +222,31 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                     telemetry.update();
                 }
 
+                //Stop ziptie motor during arm movement
                 ziptieStop();
 
+                //Stop Spin Arm
                 spinArm.setPower(SPIN_ARM_STOP);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+                //One second delay
                 sleep(1000);
             }
+
+            //Manual Spin Arm movement
             else if(gamepad2.right_trigger > DEADZONE){
-                // manual slow throw mode
+                //manual forward mode
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 spinArm.setDirection(DcMotor.Direction.REVERSE);
                 spinArm.setPower(gamepad2.right_trigger*SPIN_ARM_MINSPEED);
             }
-            /*
-            Disable this because going in the opposite direction makes the encoder go negative.
             else if(gamepad2.left_trigger > DEADZONE){
-                // manual fast throw mode
+                //manual backward mode
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 spinArm.setDirection(DcMotor.Direction.FORWARD);
                 spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
-            }*/
+            }
+            //Make sure that motor does not run while pressure is not applied
             else {
                 spinArm.setPower(SPIN_ARM_STOP);
             }
@@ -257,13 +258,13 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
             }
 
             if (toggleYButtonZiptie == true) {
-                ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);
+                ziptieRun();
             }
             else {
-                ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);
+                ziptieStop();
             }
 
-            //Reset button
+            //Reset to zero button
             if(gamepad2.x == true){
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -273,11 +274,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
         }
     }
 
-    public void ziptieRun (){
-        ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);
-    }
-
-    public void ziptieStop (){
-        ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);
-    }
+    //Ziptie Motor Functions
+    public void ziptieRun (){ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);}
+    public void ziptieStop (){ziptieMotor.setPower(ZIPTIE_MOTOR_STOP);}
 }

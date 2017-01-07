@@ -9,7 +9,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
 
     private double MAX_DRIVE_SPEED = .2d;
     private double STOP_DRIVE = 0d;
-    private double SPIN_ARM_MAXSPEED = 1.0d;
+    private double SPIN_ARM_MAXSPEED = 0.75d;
     private double SPIN_ARM_MINSPEED = .3d;
     private double SPIN_ARM_STOP = 0d;
     private long SPIN_ARM_SLOW_ROTATE_TIME = 500;
@@ -30,33 +30,26 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     int spinArmPort;
 
     BBOTZ_AutonomousMode_Common_Methods(HardwareMap hardwareMap) {
-        this.leftDrive = leftDrive;
-
-        this.rightDrive = rightDrive;
-        this.spinArm = spinArm;
-
-         /* eg: Initialize the hardware variables. Note that the strings used here as parameters
-         * to 'get' must correspond to the names assigned during the robot configuration
-         * step (using the FTC Robot Controller app on the phone).
-         */
+        //Initialize hardware
         leftDrive = hardwareMap.dcMotor.get("left drive wheel");
         rightDrive = hardwareMap.dcMotor.get("right drive wheel");
         spinArm = hardwareMap.dcMotor.get("spin arm");
         ziptieMotor = hardwareMap.dcMotor.get("ziptie motor");
-        // eg: Set the drive motor directions:
-        // "Reverse" the motor that runs backwards when connected directly to the battery
+
+        //Set directions for motors
         leftDrive.setDirection(DcMotor.Direction.REVERSE);  // Set to REVERSE if using AndyMark motors
         rightDrive.setDirection(DcMotor.Direction.FORWARD); // Set to FORWARD if using AndyMark motors
         spinArm.setDirection(DcMotor.Direction.REVERSE);
         ziptieMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        //Remove once added to auto mode
+        //Spin arm setup
         spinArmController = spinArm.getController();
         spinArmPort = spinArm.getPortNumber();
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
         resetEncoder();
     }
 
+    //drive forwards
     protected void driveForward(long driveTime) throws InterruptedException {
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
@@ -66,6 +59,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         Thread.sleep(STOP_TIME);
     }
 
+    //turn left
     protected void turnLeft(long driveTime) throws InterruptedException{
         rightDrive.setPower(MAX_DRIVE_SPEED);
         Thread.sleep(driveTime);
@@ -73,6 +67,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         Thread.sleep(STOP_TIME);
     }
 
+    //tank turn left
     protected void tankTurnLeft(long driveTime) throws InterruptedException{
         rightDrive.setPower(MAX_DRIVE_SPEED);
         leftDrive.setPower(-MAX_DRIVE_SPEED);
@@ -82,6 +77,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         Thread.sleep(STOP_TIME);
     }
 
+    //turn right
     protected void turnRight(long driveTime) throws InterruptedException {
         leftDrive.setPower(MAX_DRIVE_SPEED);
         Thread.sleep(driveTime);
@@ -89,6 +85,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         Thread.sleep(STOP_TIME);
     }
 
+    //tank turn right
     protected void tankTurnRight(long driveTime) throws InterruptedException{
         rightDrive.setPower(-MAX_DRIVE_SPEED);
         leftDrive.setPower(MAX_DRIVE_SPEED);
@@ -98,6 +95,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         Thread.sleep(STOP_TIME);
     }
 
+    //launch two balls
     protected void launchBall() throws InterruptedException {
         startSpinArmLaunch();
         ziptieRun();
@@ -107,16 +105,22 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         ziptieStop();
     }
 
+    //launch position spin arm
     protected void startSpinArmLaunch() throws InterruptedException {
+        //automatic throw mode
+
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
 
         int prevPos = Integer.MAX_VALUE;
 
+        //320 is launch position
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
         spinArm.setTargetPosition(320);
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
         spinArm.setPower(SPIN_ARM_MAXSPEED);
         long startTime = System.currentTimeMillis();
+
+        //while() loop for motor burnout prevention
         while (spinArm.isBusy()) {
             // wait for arm to throw
             long currentTime = System.currentTimeMillis();
@@ -134,21 +138,27 @@ public class BBOTZ_AutonomousMode_Common_Methods {
             }
         }
 
+        //Stop Spin Arm
         spinArm.setPower(SPIN_ARM_STOP);
 
+        //One second delay
         Thread.sleep(1000);
     }
 
+    //home position spin arm
     protected void startSpinArmHome () throws InterruptedException {
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
 
         int prevPos = Integer.MAX_VALUE;
 
+        //700 is home position
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
         spinArm.setTargetPosition(700);
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
         spinArm.setPower(SPIN_ARM_MINSPEED);
         long startTime = System.currentTimeMillis();
+
+        //while() loop for motor burnout prevention
         while (spinArm.isBusy()) {
             // wait for arm to throw
             long currentTime = System.currentTimeMillis();
@@ -166,12 +176,15 @@ public class BBOTZ_AutonomousMode_Common_Methods {
             }
         }
 
+        //Stop Spin Arm
         spinArm.setPower(SPIN_ARM_STOP);
         resetEncoder();
 
+        //One second delay
         Thread.sleep(1000);
     }
 
+    //drive backwards
     protected void driveBackward(long driveTime) throws InterruptedException {
         leftDrive.setPower(-MAX_DRIVE_SPEED);
         rightDrive.setPower(-MAX_DRIVE_SPEED);

@@ -1,35 +1,4 @@
-/*
-Copyright (c) 2016 Robert Atkinson
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted (subject to the limitations in the disclaimer below) provided that
-the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list
-of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-Neither the name of Robert Atkinson nor the names of his contributors may be used to
-endorse or promote products derived from this software without specific prior
-written permission.
-
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
-LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESSFOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+//TANK MODE CONTROL
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -45,20 +14,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
-    private double SPIN_ARM_MAXSPEED = .8d;
+    private double SPIN_ARM_MAXSPEED = 1.0d;
     private double SPIN_ARM_MINSPEED = .2d;
     private double SPIN_ARM_STOP = 0d;
     private double ZIPTIE_MOTOR_SPEED = 1d;
     private double ZIPTIE_MOTOR_STOP = 0d;
     private double DEADZONE = .1d;
-    private long SPIN_ARM_ROTATE_TIME = 200;
-    private double ACCELERATION_RATE = .25;
     private long BEACON_DPAD_RUN_TIME = 500;
     private long Y_TOGGLE_RUN_TIME = 800;
 
     private float DRIVE_MULTIPLE = .2f;
-
-    private double HAND_SPEED = .01d;
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
@@ -148,12 +113,9 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
                 int prevPos = Integer.MAX_VALUE;
 
-                //Run ziptie motor during arm movement
-                ziptieRun();
-
                 //330 is launch position
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
-                spinArm.setTargetPosition(330);
+                spinArm.setTargetPosition(270);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
                 spinArm.setPower(SPIN_ARM_MAXSPEED);
                 long startTime = System.currentTimeMillis();
@@ -171,16 +133,13 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                         prevPos = spinArm.getCurrentPosition();
                     }
 
-                    if (spinArm.getCurrentPosition() >= 330) {
+                    if (spinArm.getCurrentPosition() >= 270) {
                         break;
                     }
 
                     telemetry.update();
 
                 }
-
-                //Stop ziptie motor during arm movement
-                ziptieStop();
 
                 //Stop Spin Arm
                 spinArm.setPower(SPIN_ARM_STOP);
@@ -192,12 +151,9 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 // automatic home reset mode
                 int prevPos = Integer.MAX_VALUE;
 
-                //Run ziptie motor during arm movement
-                ziptieRun();
-
                 //690 is home position
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
-                spinArm.setTargetPosition(690);
+                spinArm.setTargetPosition(700);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
                 spinArm.setPower(SPIN_ARM_MINSPEED);
                 long startTime = System.currentTimeMillis();
@@ -215,15 +171,12 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                         prevPos = spinArm.getCurrentPosition();
                     }
 
-                    if (spinArm.getCurrentPosition() >= 690) {
+                    if (spinArm.getCurrentPosition() >= 700) {
                         break;
                     }
 
                     telemetry.update();
                 }
-
-                //Stop ziptie motor during arm movement
-                ziptieStop();
 
                 //Stop Spin Arm
                 spinArm.setPower(SPIN_ARM_STOP);
@@ -240,12 +193,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 spinArm.setDirection(DcMotor.Direction.REVERSE);
                 spinArm.setPower(gamepad2.right_trigger*SPIN_ARM_MINSPEED);
             }
-            else if(gamepad2.left_trigger > DEADZONE){
-                //manual backward mode
-                spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                spinArm.setDirection(DcMotor.Direction.FORWARD);
-                spinArm.setPower(gamepad2.left_trigger*SPIN_ARM_MINSPEED);
-            }
+
             //Make sure that motor does not run while pressure is not applied
             else {
                 spinArm.setPower(SPIN_ARM_STOP);

@@ -9,7 +9,8 @@ public class BBOTZ_AutonomousMode_Common_Methods {
 
     private double MAX_DRIVE_SPEED = .2d;
     private double STOP_DRIVE = 0d;
-    private double SPIN_ARM_MAXSPEED = 0.75d;
+    private double SPIN_ARM_FIRST_SHOT = 1.0d;
+    private double SPIN_ARM_SECOND_SHOT = 1.0d;
     private double SPIN_ARM_MINSPEED = .3d;
     private double SPIN_ARM_STOP = 0d;
     private long SPIN_ARM_SLOW_ROTATE_TIME = 500;
@@ -97,16 +98,16 @@ public class BBOTZ_AutonomousMode_Common_Methods {
 
     //launch two balls
     protected void launchBall() throws InterruptedException {
-        startSpinArmLaunch();
+        startSpinArmLaunch(SPIN_ARM_FIRST_SHOT, 270);
         ziptieRun();
         startSpinArmHome();
-        startSpinArmLaunch();
+        startSpinArmLaunch(SPIN_ARM_SECOND_SHOT, 270);
         startSpinArmHome();
         ziptieStop();
     }
 
     //launch position spin arm
-    protected void startSpinArmLaunch() throws InterruptedException {
+    protected void startSpinArmLaunch(double spinSpeed, int spinLocation) throws InterruptedException {
         //automatic throw mode
 
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -115,9 +116,9 @@ public class BBOTZ_AutonomousMode_Common_Methods {
 
         //320 is launch position
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
-        spinArm.setTargetPosition(320);
+        spinArm.setTargetPosition(spinLocation);
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
-        spinArm.setPower(SPIN_ARM_MAXSPEED);
+        spinArm.setPower(spinSpeed);
         long startTime = System.currentTimeMillis();
 
         //while() loop for motor burnout prevention
@@ -133,7 +134,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
                 prevPos = spinArm.getCurrentPosition();
             }
 
-            if (spinArm.getCurrentPosition() >= 320) {
+            if (spinArm.getCurrentPosition() >= spinLocation) {
                 break;
             }
         }

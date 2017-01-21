@@ -17,6 +17,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
     private double SPIN_ARM_MAXSPEED = 1.0d;
     private double SPIN_ARM_MINSPEED = .2d;
     private double SPIN_ARM_STOP = 0d;
+    private int SPIN_ARM_CHECK_TIME = 50;
     private double ZIPTIE_MOTOR_SPEED = 1d;
     private double ZIPTIE_MOTOR_STOP = 0d;
     private double DEADZONE = .1d;
@@ -115,7 +116,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
 
                 //330 is launch position
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
-                spinArm.setTargetPosition(270);
+                spinArm.setTargetPosition(280);
                 spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_TO_POSITION);
                 spinArm.setPower(SPIN_ARM_MAXSPEED);
                 long startTime = System.currentTimeMillis();
@@ -124,7 +125,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 while (spinArm.isBusy()) {
                     // wait for arm to throw
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime > startTime + 50) {
+                    if (currentTime > startTime + SPIN_ARM_CHECK_TIME) {
                         if (prevPos == spinArm.getCurrentPosition()) {
                             break;
                         }
@@ -133,7 +134,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                         prevPos = spinArm.getCurrentPosition();
                     }
 
-                    if (spinArm.getCurrentPosition() >= 270) {
+                    if (spinArm.getCurrentPosition() >= 280) {
                         break;
                     }
 
@@ -162,7 +163,7 @@ public class BBOTZ_OpMode_Tank_Mode_Control extends LinearOpMode {
                 while (spinArm.isBusy()) {
                     // wait for arm to throw
                     long currentTime = System.currentTimeMillis();
-                    if (currentTime > startTime + 100) {
+                    if (currentTime > startTime + SPIN_ARM_CHECK_TIME) {
                         if (prevPos == spinArm.getCurrentPosition()) {
                             break;
                         }

@@ -13,6 +13,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     private double SPIN_ARM_SECOND_SHOT = 1.0d;
     private double SPIN_ARM_MINSPEED = .3d;
     private double SPIN_ARM_STOP = 0d;
+    private int SPIN_ARM_CHECK_TIME = 50;
     private long SPIN_ARM_SLOW_ROTATE_TIME = 500;
     private long SPIN_ARM_FAST_ROTATE_TIME = 800;
     private double ZIPTIE_MOTOR_SPEED = 1d;
@@ -98,10 +99,10 @@ public class BBOTZ_AutonomousMode_Common_Methods {
 
     //launch two balls
     protected void launchBall() throws InterruptedException {
-        startSpinArmLaunch(SPIN_ARM_FIRST_SHOT, 270);
+        startSpinArmLaunch(SPIN_ARM_FIRST_SHOT, 280);
         ziptieRun();
         startSpinArmHome();
-        startSpinArmLaunch(SPIN_ARM_SECOND_SHOT, 270);
+        startSpinArmLaunch(SPIN_ARM_SECOND_SHOT, 280);
         startSpinArmHome();
         ziptieStop();
     }
@@ -125,7 +126,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         while (spinArm.isBusy()) {
             // wait for arm to throw
             long currentTime = System.currentTimeMillis();
-            if (currentTime > startTime + 50) {
+            if (currentTime > startTime + SPIN_ARM_CHECK_TIME) {
                 if (prevPos == spinArm.getCurrentPosition()) {
                     break;
                 }
@@ -163,7 +164,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         while (spinArm.isBusy()) {
             // wait for arm to throw
             long currentTime = System.currentTimeMillis();
-            if (currentTime > startTime + 100) {
+            if (currentTime > startTime + SPIN_ARM_CHECK_TIME) {
                 if (prevPos == spinArm.getCurrentPosition()) {
                     break;
                 }

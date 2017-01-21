@@ -20,13 +20,12 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
 
         BBOTZ_AutonomousMode_Common_Methods autonomousModeCommonMethods = new BBOTZ_AutonomousMode_Common_Methods(hardwareMap);
 
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        runtime.reset();
-
         // reset encoder
         autonomousModeCommonMethods.resetEncoder();
 
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+        runtime.reset();
 
         // Advance 36", then stop
         autonomousModeCommonMethods.driveForward(0);

@@ -28,7 +28,7 @@ public class BBOTZ_AutonomousMode_Long extends LinearOpMode {
         runtime.reset();
 
         // Advance 36", then stop (700)
-        autonomousModeCommonMethods.driveForwardUsingODS();
+        autonomousModeCommonMethods.driveForwardUsingTime(700);
 
         // Launch ball
         autonomousModeCommonMethods.launchBall();

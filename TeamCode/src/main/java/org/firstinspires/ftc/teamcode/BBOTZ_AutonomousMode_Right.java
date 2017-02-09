@@ -28,7 +28,7 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         runtime.reset();
 
         // Advance 36", then stop
-        autonomousModeCommonMethods.driveForward(0);
+        autonomousModeCommonMethods.driveForwardUsingTime(0);
 
         // Launch ball
         autonomousModeCommonMethods.launchBall();
@@ -37,12 +37,12 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         autonomousModeCommonMethods.tankTurnRight(300);
 
         // Advance 30" to go past cap ball
-        autonomousModeCommonMethods.driveForward(2700);
+        autonomousModeCommonMethods.driveForwardUsingTime(2700);
 
         // Turn to knock off ball
         // Note: the value does not match the mirror autonomous mode because
         // the strengh of the motors are not equal.
-        autonomousModeCommonMethods.tankTurnLeft(1200);
+        autonomousModeCommonMethods.tankTurnLeft(1500);
 
         // Backup up ramp ~70"
         autonomousModeCommonMethods.driveBackward(8000);

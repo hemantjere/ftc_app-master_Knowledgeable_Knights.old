@@ -1,14 +1,12 @@
-//AUTONOMOUS MODE LEFT
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
-@Autonomous(name="Autonomous Backup Left", group="Autonomous mode")
+@Autonomous(name="Autonomous Short", group="Autonomous mode")
 // @Disabled
-public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
+public class BBOTZ_AutonomousMode_Short extends LinearOpMode {
 
     BBOTZ_AutonomousMode_Common_Methods autonomousModeCommonMethods;
 
@@ -30,21 +28,10 @@ public class BBOTZ_AutonomousMode_Left extends LinearOpMode {
         runtime.reset();
 
         // Advance 36", then stop
-        autonomousModeCommonMethods.driveForwardUsingTime(0);
+        autonomousModeCommonMethods.driveForwardUsingTime(700);
 
         // Launch ball
         autonomousModeCommonMethods.launchBall();
 
-        // Turn to knock off ball
-        autonomousModeCommonMethods.tankTurnLeft(300);
-
-        // Advance 30" to go past cap ball
-        autonomousModeCommonMethods.driveForwardUsingTime(2700);
-
-        // Turn to knock off ball
-        autonomousModeCommonMethods.tankTurnRight(1500);
-
-        // Backup up ramp ~70"
-        autonomousModeCommonMethods.driveBackward(8000);
     }
 }

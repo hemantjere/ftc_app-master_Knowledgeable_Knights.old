@@ -3,11 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class BBOTZ_AutonomousMode_Common_Methods {
 
-    private double MAX_DRIVE_SPEED = .2d;
+    private double MAX_DRIVE_SPEED = .1d;
     private double STOP_DRIVE = 0d;
     private double SPIN_ARM_FIRST_SHOT = 1.0d;
     private double SPIN_ARM_SECOND_SHOT = 1.0d;
@@ -18,6 +19,8 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     private long SPIN_ARM_FAST_ROTATE_TIME = 800;
     private double ZIPTIE_MOTOR_SPEED = 1d;
     private double ZIPTIE_MOTOR_STOP = 0d;
+    private int ODS_TEST_TIME = 10;
+    private double ODS_VALUE = 0.05d;
 
     private long STOP_TIME = 500;
 
@@ -27,7 +30,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     DcMotor rightDrive = null;
     DcMotor spinArm = null;
     DcMotor ziptieMotor = null;
-
+    OpticalDistanceSensor odsSensor = null;
     DcMotorController spinArmController;
     int spinArmPort;
 
@@ -37,6 +40,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         rightDrive = hardwareMap.dcMotor.get("right drive wheel");
         spinArm = hardwareMap.dcMotor.get("spin arm");
         ziptieMotor = hardwareMap.dcMotor.get("ziptie motor");
+        odsSensor = hardwareMap.opticalDistanceSensor.get("ods");
 
         //Set directions for motors
         leftDrive.setDirection(DcMotor.Direction.REVERSE);  // Set to REVERSE if using AndyMark motors
@@ -52,10 +56,21 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     }
 
     //drive forwards
-    protected void driveForward(long driveTime) throws InterruptedException {
+    protected void driveForwardUsingTime(long driveTime) throws InterruptedException {
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
         Thread.sleep(driveTime);
+        leftDrive.setPower(STOP_DRIVE);
+        rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(STOP_TIME);
+    }
+
+    protected void driveForwardUsingODS() throws InterruptedException {
+        leftDrive.setPower(MAX_DRIVE_SPEED);
+        rightDrive.setPower(MAX_DRIVE_SPEED);
+        while(odsSensor.getLightDetected() < ODS_VALUE) {
+            Thread.sleep(ODS_TEST_TIME);
+        }
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
         Thread.sleep(STOP_TIME);
@@ -195,6 +210,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         rightDrive.setPower(STOP_DRIVE);
         Thread.sleep(STOP_TIME);
     }
+
 
     protected void ziptieRun (){
         ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);

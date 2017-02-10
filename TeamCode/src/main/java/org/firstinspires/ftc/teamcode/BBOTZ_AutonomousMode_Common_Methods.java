@@ -1,14 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class BBOTZ_AutonomousMode_Common_Methods {
 
     private double MAX_DRIVE_SPEED = .1d;
+    private double MAX_DRIVE_SPEED_BEACON = .4d;
+    private double MAX_DRIVE_SPEED_PRESS_BEACON = 1d;
     private double STOP_DRIVE = 0d;
     private double SPIN_ARM_FIRST_SHOT = 1.0d;
     private double SPIN_ARM_SECOND_SHOT = 1.0d;
@@ -20,7 +27,14 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     private double ZIPTIE_MOTOR_SPEED = 1d;
     private double ZIPTIE_MOTOR_STOP = 0d;
     private int ODS_TEST_TIME = 10;
-    private double ODS_VALUE = 0.05d;
+    private double ODS_TAPE_VALUE = 0.05d;
+    private double TIME_TO_MOVE_TOWARDS_BEACON = 20000;
+    private double ADJUSTMENT_ERROR = .1;
+    private int MAX_BEACON_PRESSES = 5;
+    private double TAPE_CENTER_LINE = .6d;
+
+    protected static int GET_RED = 0;
+    protected static int GET_BLUE = 1;
 
     private long STOP_TIME = 500;
 
@@ -31,6 +45,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     DcMotor spinArm = null;
     DcMotor ziptieMotor = null;
     OpticalDistanceSensor odsSensor = null;
+    ColorSensor colorSensor = null;
     DcMotorController spinArmController;
     int spinArmPort;
 
@@ -41,6 +56,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         spinArm = hardwareMap.dcMotor.get("spin arm");
         ziptieMotor = hardwareMap.dcMotor.get("ziptie motor");
         odsSensor = hardwareMap.opticalDistanceSensor.get("ods");
+        colorSensor = hardwareMap.colorSensor.get("color sensor");
 
         //Set directions for motors
         leftDrive.setDirection(DcMotor.Direction.REVERSE);  // Set to REVERSE if using AndyMark motors
@@ -53,9 +69,22 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         spinArmPort = spinArm.getPortNumber();
         spinArmController.setMotorMode(spinArmPort, DcMotor.RunMode.RUN_USING_ENCODER);
         resetEncoder();
+
+        //Turn LED off
+        turnColorSensorLedOff();
     }
 
-    //drive forwards
+    // drive beacon
+    protected void driveForwardUsingTimeBeacon(long driveTime) throws InterruptedException {
+        leftDrive.setPower(MAX_DRIVE_SPEED_BEACON);
+        rightDrive.setPower(MAX_DRIVE_SPEED_BEACON);
+        Thread.sleep(driveTime);
+        leftDrive.setPower(STOP_DRIVE);
+        rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(STOP_TIME);
+    }
+
+    // drive forwards
     protected void driveForwardUsingTime(long driveTime) throws InterruptedException {
         leftDrive.setPower(MAX_DRIVE_SPEED);
         rightDrive.setPower(MAX_DRIVE_SPEED);
@@ -65,19 +94,123 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         Thread.sleep(STOP_TIME);
     }
 
-    protected void driveForwardUsingODS() throws InterruptedException {
-        leftDrive.setPower(MAX_DRIVE_SPEED);
-        rightDrive.setPower(MAX_DRIVE_SPEED);
-        while(odsSensor.getLightDetected() < ODS_VALUE) {
-            Thread.sleep(ODS_TEST_TIME);
-        }
+    //drive backwards
+    protected void driveBackwardUsingTime(long driveTime) throws InterruptedException {
+        leftDrive.setPower(-MAX_DRIVE_SPEED);
+        rightDrive.setPower(-MAX_DRIVE_SPEED);
+        Thread.sleep(driveTime);
         leftDrive.setPower(STOP_DRIVE);
         rightDrive.setPower(STOP_DRIVE);
         Thread.sleep(STOP_TIME);
     }
 
+    protected void driveBackwardUsingTimePressBeacon(long driveTime) throws InterruptedException{
+        leftDrive.setPower(-MAX_DRIVE_SPEED_PRESS_BEACON);
+        rightDrive.setPower(-MAX_DRIVE_SPEED_PRESS_BEACON);
+        Thread.sleep(driveTime);
+        leftDrive.setPower(STOP_DRIVE);
+        rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(STOP_TIME);
+    }
+
+    protected void driveForwardUsingODS() throws InterruptedException {
+        leftDrive.setPower(MAX_DRIVE_SPEED);
+        rightDrive.setPower(MAX_DRIVE_SPEED);
+
+        while(odsSensor.getLightDetected() < ODS_TAPE_VALUE) {
+            Thread.sleep(ODS_TEST_TIME);
+        }
+
+        leftDrive.setPower(STOP_DRIVE);
+        rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(STOP_TIME);
+    }
+
+    protected void followTapeUsingODS(Telemetry telemetry) throws InterruptedException {
+        double odsDelta;
+        double powerToLeftWheel = 0d;
+        double powerToRightWheel = 0d;
+
+        // Follow tape
+        double startTime = System.currentTimeMillis();
+        double currentODSReading = odsSensor.getLightDetected();
+        double prevODSReading = currentODSReading;
+
+        leftDrive.setPower(-MAX_DRIVE_SPEED);
+        rightDrive.setPower(-MAX_DRIVE_SPEED);
+
+        while (true) {
+
+            Thread.sleep(10);
+
+            currentODSReading = odsSensor.getLightDetected();
+            odsDelta = .6d - currentODSReading;
+            telemetry.addData("currentODSReading", currentODSReading);
+            telemetry.addData("odsDelta", odsDelta);
+
+            if (odsDelta <= 0) {
+                // Apply more power to left wheel (remember ,we're going backwards)
+                powerToLeftWheel = -MAX_DRIVE_SPEED - odsDelta;
+                powerToRightWheel = -MAX_DRIVE_SPEED;
+            }
+            else {
+                // Apply more power to right wheel (remember ,we're going backwards)
+                powerToLeftWheel = -MAX_DRIVE_SPEED;
+                powerToRightWheel = -MAX_DRIVE_SPEED - odsDelta;
+            }
+
+            telemetry.addData("PowerLeftWheel", powerToLeftWheel);
+            telemetry.addData("PowerRightWheel", powerToRightWheel);
+            telemetry.update();
+
+            // Move
+            leftDrive.setPower(powerToLeftWheel);
+            rightDrive.setPower(powerToRightWheel);
+
+            // Stop moving towards beacon after x seconds
+            double currentTime = System.currentTimeMillis();
+            if (currentTime > (startTime + TIME_TO_MOVE_TOWARDS_BEACON)) {
+                break;
+            }
+        }
+
+        leftDrive.setPower(STOP_DRIVE);
+        rightDrive.setPower(STOP_DRIVE);
+        Thread.sleep(STOP_TIME);
+    }
+
+    protected void pressBeaconForColor(int desiredColor) throws InterruptedException {
+        boolean done = false;
+        int numberOfTries = 0;
+
+        while (! done) {
+            // Press the beacon button
+            driveBackwardUsingTimePressBeacon(1000);
+
+            // Test for desired color
+            if (desiredColor == 1) {
+                if (colorSensor.red() > colorSensor.blue()) {
+                    done = true;
+                }
+            }
+            else if (desiredColor == 1) {
+                if (colorSensor.blue() > colorSensor.red()) {
+                    done = true;
+                }
+            }
+
+            // Drive forward after color checked to press again
+            driveForwardUsingTime(800);
+
+            // If number of tries exceeded, stop
+            numberOfTries++;
+            if (numberOfTries > MAX_BEACON_PRESSES)
+                done = true;
+        }
+    }
+
     //turn left
-    protected void turnLeft(long driveTime) throws InterruptedException{
+    protected void turnLeft(long driveTime) throws InterruptedException {
         rightDrive.setPower(MAX_DRIVE_SPEED);
         Thread.sleep(driveTime);
         rightDrive.setPower(STOP_DRIVE);
@@ -201,16 +334,7 @@ public class BBOTZ_AutonomousMode_Common_Methods {
         Thread.sleep(1000);
     }
 
-    //drive backwards
-    protected void driveBackward(long driveTime) throws InterruptedException {
-        leftDrive.setPower(-MAX_DRIVE_SPEED);
-        rightDrive.setPower(-MAX_DRIVE_SPEED);
-        Thread.sleep(driveTime);
-        leftDrive.setPower(STOP_DRIVE);
-        rightDrive.setPower(STOP_DRIVE);
-        Thread.sleep(STOP_TIME);
-    }
-
+    protected void turnColorSensorLedOff() { colorSensor.enableLed(false);}
 
     protected void ziptieRun (){
         ziptieMotor.setPower(ZIPTIE_MOTOR_SPEED);

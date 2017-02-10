@@ -45,6 +45,6 @@ public class BBOTZ_AutonomousMode_Right extends LinearOpMode {
         autonomousModeCommonMethods.tankTurnLeft(1500);
 
         // Backup up ramp ~70"
-        autonomousModeCommonMethods.driveBackward(8000);
+        autonomousModeCommonMethods.driveBackwardUsingTime(8000);
     }
 }

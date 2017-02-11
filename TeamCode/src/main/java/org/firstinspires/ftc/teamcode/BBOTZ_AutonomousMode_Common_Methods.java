@@ -26,12 +26,12 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     private long SPIN_ARM_FAST_ROTATE_TIME = 800;
     private double ZIPTIE_MOTOR_SPEED = 1d;
     private double ZIPTIE_MOTOR_STOP = 0d;
-    private int ODS_TEST_TIME = 10;
+    private int ODS_TEST_TIME = 50;
     private double ODS_TAPE_VALUE = 0.05d;
     private double TIME_TO_MOVE_TOWARDS_BEACON = 20000;
     private double ADJUSTMENT_ERROR = .1;
     private int MAX_BEACON_PRESSES = 5;
-    private double TAPE_CENTER_LINE = .6d;
+    private double PREFERRED_LIGHT_VALUE = .5d;
 
     protected static int GET_RED = 0;
     protected static int GET_BLUE = 1;
@@ -127,48 +127,39 @@ public class BBOTZ_AutonomousMode_Common_Methods {
     }
 
     protected void followTapeUsingODS(Telemetry telemetry) throws InterruptedException {
+        double currentODSReading;
         double odsDelta;
-        double powerToLeftWheel = 0d;
-        double powerToRightWheel = 0d;
+        double powerToLeftWheel = -.075D;
+        double powerToRightWheel = -.075D;
+        boolean lineFollowerActivated = false;
 
-        // Follow tape
-        double startTime = System.currentTimeMillis();
-        double currentODSReading = odsSensor.getLightDetected();
-        double prevODSReading = currentODSReading;
-
-        leftDrive.setPower(-MAX_DRIVE_SPEED);
-        rightDrive.setPower(-MAX_DRIVE_SPEED);
+        double startTime = runtime.startTime();
 
         while (true) {
-
-            Thread.sleep(10);
-
             currentODSReading = odsSensor.getLightDetected();
-            odsDelta = .6d - currentODSReading;
+            odsDelta = PREFERRED_LIGHT_VALUE - currentODSReading;
+
+            if (odsDelta < 0)
+                lineFollowerActivated = true;
+
+            if (lineFollowerActivated) {
+                    // odsDelta will be either positive or negative
+                    powerToLeftWheel = -.075d + (odsDelta * .075d);
+                    powerToRightWheel = -.075d - (odsDelta * .075d);
+            }
+
             telemetry.addData("currentODSReading", currentODSReading);
             telemetry.addData("odsDelta", odsDelta);
-
-            if (odsDelta <= 0) {
-                // Apply more power to left wheel (remember ,we're going backwards)
-                powerToLeftWheel = -MAX_DRIVE_SPEED - odsDelta;
-                powerToRightWheel = -MAX_DRIVE_SPEED;
-            }
-            else {
-                // Apply more power to right wheel (remember ,we're going backwards)
-                powerToLeftWheel = -MAX_DRIVE_SPEED;
-                powerToRightWheel = -MAX_DRIVE_SPEED - odsDelta;
-            }
-
-            telemetry.addData("PowerLeftWheel", powerToLeftWheel);
-            telemetry.addData("PowerRightWheel", powerToRightWheel);
+            telemetry.addData("powerToLeftWheel", powerToLeftWheel);
+            telemetry.addData("powerToRightWheel", powerToRightWheel);
             telemetry.update();
 
-            // Move
             leftDrive.setPower(powerToLeftWheel);
             rightDrive.setPower(powerToRightWheel);
+            Thread.sleep(ODS_TEST_TIME);
 
             // Stop moving towards beacon after x seconds
-            double currentTime = System.currentTimeMillis();
+            double currentTime = runtime.time();
             if (currentTime > (startTime + TIME_TO_MOVE_TOWARDS_BEACON)) {
                 break;
             }

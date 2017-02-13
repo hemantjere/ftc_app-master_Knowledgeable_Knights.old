@@ -1,14 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Autonomous Long Beacon", group="Autonomous mode")
+@Autonomous(name="Autonomous Beacon Blue", group="Autonomous mode")
 // @Disabled
-public class BBOTZ_AutonomousMode_Long_Beacon extends LinearOpMode {
+public class BBOTZ_AutonomousMode_Beacon_Blue extends LinearOpMode {
 
     BBOTZ_AutonomousMode_Common_Methods autonomousModeCommonMethods;
 
@@ -29,8 +27,6 @@ public class BBOTZ_AutonomousMode_Long_Beacon extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        /*
-
         // Launch ball
         //autonomousModeCommonMethods.launchBall();
 
@@ -38,7 +34,7 @@ public class BBOTZ_AutonomousMode_Long_Beacon extends LinearOpMode {
         autonomousModeCommonMethods. driveForwardUsingTime(1000);
 
         // Tankturn towards beacon #1 tape
-        autonomousModeCommonMethods.tankTurnLeft(700);
+        autonomousModeCommonMethods.tankTurnLeft(800);
 
         // Drive fast towards beacon #1 tape
         autonomousModeCommonMethods.driveForwardUsingTimeBeacon(1500);
@@ -47,29 +43,26 @@ public class BBOTZ_AutonomousMode_Long_Beacon extends LinearOpMode {
         autonomousModeCommonMethods.driveForwardUsingODS();
 
         // Tankturn to have back face beacon #1
-        autonomousModeCommonMethods.tankTurnRight(2200);
+        autonomousModeCommonMethods.tankTurnRight(1700);
 
         // After tankturn, is the sensor still on beacon #1 tape?
         // if not, adjust here
 
         // Assuming the tape is found ... continue
 
-        */
-
         // Follow tape to beacon #1, going backwards
-        autonomousModeCommonMethods.followTapeUsingODS(telemetry);
+        // autonomousModeCommonMethods.followTapeUsingODS(telemetry);
 
-        /*
         // Move forward to read beacon #1 color
-        autonomousModeCommonMethods.driveForwardUsingTime(800);
+        // autonomousModeCommonMethods.driveForwardUsingTime(800);
 
         // Change beacon #1 color
-        autonomousModeCommonMethods.pressBeaconForColor(1);
+        // autonomousModeCommonMethods.pressBeaconForColor(0);
 
         // Start moving to next beacon
 
         // Tankturn to beacon #2 tape (slightly away from wall)
-        autonomousModeCommonMethods.tankTurnLeft(1800);
+        autonomousModeCommonMethods.tankTurnLeft(1300);
 
         // Search for beacon #2 tape using ODS sensor
         autonomousModeCommonMethods.driveForwardUsingODS();
@@ -78,10 +71,10 @@ public class BBOTZ_AutonomousMode_Long_Beacon extends LinearOpMode {
         autonomousModeCommonMethods.tankTurnRight(2000);
 
         // Follow tape to beacon #2, going backwards
-        autonomousModeCommonMethods.followTapeUsingODS();
+        // autonomousModeCommonMethods.followTapeUsingODS();
 
         // Move forward to get beacon #2 color
-        autonomousModeCommonMethods.driveForwardUsingTime(800);
+        // autonomousModeCommonMethods.driveForwardUsingTime(800);
 
         // Change beacon #2 color
         autonomousModeCommonMethods.pressBeaconForColor(1);
@@ -94,6 +87,6 @@ public class BBOTZ_AutonomousMode_Long_Beacon extends LinearOpMode {
 
         // Park on center ramp
         autonomousModeCommonMethods.turnLeft(800);
-        */
+
     }
 }
